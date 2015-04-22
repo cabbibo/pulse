@@ -1,7 +1,7 @@
-function PathConnector( connectionPaths , output , xWidth , bufferSize){
+function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID ){
 	
 
-	var totalWires = 0; 
+	var totalWires = baseID; 
 
 	var paths = [];
 
@@ -43,11 +43,14 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 
 	}
 
-	var opPath = new Path( output.points , totalWires , 0 );
+	var opPath = new Path( output.points , totalWires , baseID );
 
-	paths.push( opPath );
+	//paths.push( opPath );
 
-	return  paths
+	return {
+		inputPaths: paths,
+		outputPath: opPath
+	}
 
 }
 
