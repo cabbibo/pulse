@@ -71,11 +71,6 @@ Path.prototype.createGeometry = function( numWires ){
       var xU = this.xWidth * i;
       var zU = this.xWidth * i / ratioU;
 
-      console.log( p )
-      console.log( d )
-      console.log( pU )
-      console.log( dU )
-
       posArray[ vIndex + 0 ] = p.x + x;
       posArray[ vIndex + 1 ] = 0;
       posArray[ vIndex + 2 ] = p.z + z;

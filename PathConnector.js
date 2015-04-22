@@ -5,6 +5,8 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 
 	this.paths = [];
 
+	this.body = new THREE.Object3D();
+
 	for( var i = 0; i < connectionPaths.length; i++ ){
 
 		var cp = connectionPaths[i];
@@ -31,8 +33,6 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 
 
 	
-
-	this.body = new THREE.Object3D();
 
 	var opPath = new Path( output.points , totalWires , xWidth , 0 );
 	this.body.add( opPath.body );
