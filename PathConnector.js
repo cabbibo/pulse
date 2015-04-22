@@ -3,7 +3,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 
 	var totalWires = 0; 
 
-	this.paths = [];
+	var paths = [];
 
 	this.body = new THREE.Object3D();
 
@@ -11,9 +11,23 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 
 		var cp = connectionPaths[i];
 
+
 		var buffer = output.points[0].clone();
 		buffer.z -= bufferSize;
 		buffer.x += totalWires * xWidth;
+
+		// Make sure we start at the right offset 
+		// compared to previous line
+		if( i  !== 0 ){
+			
+			var pDown = paths[ i - 1 ];
+			var pos = pDown.points[ pDown.points.length - 2 ];
+			var dir = pDown.directions[ pDown.points.length - 2 ];
+
+			this.setPosAlongDir( buffer , pos , dir , xWidth , pDown.numWires );
+
+
+		}
 
 		var connection = output.points[0].clone();
 		connection.x += totalWires * xWidth;
@@ -21,21 +35,31 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize){
 		cp.points.push( buffer );
 		cp.points.push( connection );
 
-		var p = new Path( cp.points , cp.numWires , xWidth , totalWires );
+		var p = new Path( cp.points , cp.numWires , totalWires );
 
-		this.body.add( p.body );
-		this.paths.push( p );
+		paths.push( p );
 
 		totalWires += cp.numWires;
 
 	}
 
+	var opPath = new Path( output.points , totalWires , 0 );
 
+	paths.push( opPath );
 
-	
+	return  paths
 
-	var opPath = new Path( output.points , totalWires , xWidth , 0 );
-	this.body.add( opPath.body );
+}
 
+// v = vector to set
+// p = position start
+// d = direction 
+// w = xWidth
+// i = wire index
+PathConnector.prototype.setPosAlongDir = function( v , p , d , w , i ){
+
+  var ratio = d.x / d.z;
+  v.x = p.x + w * i;
+  v.z = p.z + ( w * i / ratio );
 
 }

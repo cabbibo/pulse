@@ -23,6 +23,7 @@
 
     <script src = "Path.js"                         ></script>
     <script src = "PathConnector.js"                ></script>
+    <script src = "Wire.js"                         ></script>
 
 
     <script>
@@ -113,11 +114,8 @@
 
         var points = [];
         points.push( new THREE.Vector3( -3 , 0 , -9 ));
-        points.push( new THREE.Vector3( -3 , 0 , -8 ));
-        points.push( new THREE.Vector3( -3 , 0 , -7 ));
         points.push( new THREE.Vector3( -3 , 0 , -6 ));
 
-        points.push( new THREE.Vector3(  0 , 0 , -3 ));
 
         inputPaths.push({
 
@@ -130,9 +128,8 @@
 
         var points = [];
         points.push( new THREE.Vector3(  3 , 0 , -9 ));
-        points.push( new THREE.Vector3(  3 , 0 , -8 ));
-        points.push( new THREE.Vector3(  3 , 0 , -7 ));
-        points.push( new THREE.Vector3(  3 , 0 , -6 ));
+        points.push( new THREE.Vector3(  3 , 0 , -9 ));
+
         
 
         //points.push( new THREE.Vector3(  0 , 0 , -2 ));
@@ -146,12 +143,8 @@
 
         var points = [];
         points.push( new THREE.Vector3(  5 , 0 , -9 ));
-        points.push( new THREE.Vector3(  5 , 0 , -8 ));
-        points.push( new THREE.Vector3(  5 , 0 , -7 ));
         points.push( new THREE.Vector3(  5 , 0 , -6 ));
         
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
 
         inputPaths.push({
           points: points,
@@ -161,8 +154,6 @@
 
         var points = [];
         points.push( new THREE.Vector3(  10 , 0 , -9 ));
-        points.push( new THREE.Vector3(  10 , 0 , -8 ));
-        points.push( new THREE.Vector3(  10 , 0 , -7 ));
         points.push( new THREE.Vector3(  10 , 0 , -3 ));
         
 
@@ -194,8 +185,13 @@
 
         var paths = new PathConnector( inputPaths , output , xWidth , 1 );
 
-        paths.body.position.y = -.5;
-        scene.add( paths.body );
+
+        console.log( paths );
+
+        var wire = new Wire( paths , xWidth );
+        wire.position.y = -.5;
+        console.log( wire );
+        scene.add( wire );
 
 
 
