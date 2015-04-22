@@ -24,6 +24,7 @@
     <script src = "Path.js"                         ></script>
     <script src = "PathConnector.js"                ></script>
     <script src = "Wire.js"                         ></script>
+    <script src = "City.js"                         ></script>
 
 
     <script>
@@ -235,7 +236,7 @@
         for( var  i = 0; i < paths.inputPaths.length; i++ ){
           allPaths.push( paths.inputPaths[i] )
         }
-        
+
         allPaths.push( paths.outputPath )
 
         console.log( allPaths )
@@ -248,6 +249,8 @@
 
 
 
+        var city = new City();
+        scene.add( city.buildings );
 
 
 

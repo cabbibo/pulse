@@ -40,6 +40,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 
 		var p = new Path( cp.points , cp.numWires , totalWires );
 
+		//p.directions[ p.directions.length - 1 ] =
 		paths.push( p );
 
 		totalWires += cp.numWires;
@@ -47,6 +48,11 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 	}
 
 	var opPath = new Path( output.points , totalWires , baseID );
+
+	for( var i = 0 ; i < paths.length; i++ ){
+		var p = paths[i];
+		p.directions[ p.directions.length - 1 ] = opPath.directions[0];
+	}
 
 	//paths.push( opPath );
 
