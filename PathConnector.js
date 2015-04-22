@@ -21,8 +21,8 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 		if( i  !== 0 ){
 			
 			var pDown = paths[ i - 1 ];
-			var pos = pDown.points[ pDown.points.length - 2 ];
-			var dir = pDown.directions[ pDown.points.length - 2 ];
+			var pos = pDown.points[ pDown.points.length - 3 ];
+			var dir = pDown.directions[ pDown.points.length - 3 ];
 
 			this.setPosAlongDir( buffer , pos , dir , xWidth , pDown.numWires );
 
@@ -32,7 +32,10 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 		var connection = output.points[0].clone();
 		connection.x += totalWires * xWidth;
 
+		var bufferHalf = connection.clone();
+		bufferHalf.z -= bufferSize / 2;
 		cp.points.push( buffer );
+		cp.points.push( bufferHalf );
 		cp.points.push( connection );
 
 		var p = new Path( cp.points , cp.numWires , totalWires );
