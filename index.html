@@ -1,0 +1,239 @@
+<html>
+
+  <head>
+    <style>
+      body{ margin: 0px; }
+      html{ overflow: hidden }
+    </style>
+  </head>
+
+  <body>
+
+    <script src = "lib/three.min.js"                ></script>
+    <script src = "lib/jquery.min.js"               ></script>
+    <script src = "lib/ShaderLoader.js"             ></script>
+
+    <script src = "lib/TrackballControls.js"        ></script>
+      
+<!--
+    <script src = "AudioController.js"              ></script>
+    <script src = "UserAudio.js"                    ></script>
+    <script src = "Stream.js"                       ></script>
+-->
+
+    <script src = "Path.js"                         ></script>
+    <script src = "PathConnector.js"                ></script>
+
+
+    <script>
+
+
+      var camera, renderer, scene , controls , clock;
+      
+      var audioMesh;
+
+      // Setting up shaders
+      var shaders = new ShaderLoader( 'shaders' );
+
+      shaders.shaderSetLoaded = function(){
+        init();
+        animate();
+      }
+
+      shaders.load( 'vs-pathDebug' , 'pathDebug' , 'vertex'   );
+      shaders.load( 'fs-pathDebug' , 'pathDebug' , 'fragment' );
+
+      shaders.load( 'vs-path' , 'path' , 'vertex'   );
+      shaders.load( 'fs-path' , 'path' , 'fragment' );
+
+
+
+      /*
+
+         Setting up Audio
+
+      */
+      //var audio = new AudioController();
+
+      //var userAudio = new UserAudio( audio.ctx , audio.gain );
+
+
+      // Muting audio, so we don't have feedback
+      //audio.mute.gain.value = 0;
+
+
+
+
+      // Normals For the Material
+      var uniforms = {
+  
+        //;t_audio: { type:"t"  , value : audio.texture },
+        dT:      { type:"f"  , value : 0             },
+        time:    { type:"f"  , value : 0             },
+
+      }
+
+
+      function init(){
+
+        /*
+
+
+           Setting up THREE.js Scene
+
+
+        */
+
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        camera = new THREE.PerspectiveCamera( 65 , w/h , .001 , 100 );
+        camera.position.z = 2;
+
+        scene = new THREE.Scene();
+
+        var dpr = window.devicePixelRatio || 1;
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( dpr );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        document.body.appendChild( renderer.domElement );
+
+        window.addEventListener( 'resize', onWindowResize, false );
+
+        clock = new THREE.Clock();
+
+        controls = new THREE.TrackballControls( camera );
+
+
+        var xWidth = .07;     
+
+        var inputPaths = []
+
+
+        var points = [];
+        points.push( new THREE.Vector3( -3 , 0 , -9 ));
+        points.push( new THREE.Vector3( -3 , 0 , -8 ));
+        points.push( new THREE.Vector3( -3 , 0 , -7 ));
+        points.push( new THREE.Vector3( -3 , 0 , -6 ));
+
+        points.push( new THREE.Vector3(  0 , 0 , -3 ));
+
+        inputPaths.push({
+
+          points: points,
+          numWires: 3
+
+        });
+
+
+
+        var points = [];
+        points.push( new THREE.Vector3(  3 , 0 , -9 ));
+        points.push( new THREE.Vector3(  3 , 0 , -8 ));
+        points.push( new THREE.Vector3(  3 , 0 , -7 ));
+        points.push( new THREE.Vector3(  3 , 0 , -6 ));
+        
+
+        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
+
+        inputPaths.push({
+          points: points,
+          numWires: 4
+        });
+
+
+
+        var points = [];
+        points.push( new THREE.Vector3(  5 , 0 , -9 ));
+        points.push( new THREE.Vector3(  5 , 0 , -8 ));
+        points.push( new THREE.Vector3(  5 , 0 , -7 ));
+        points.push( new THREE.Vector3(  5 , 0 , -6 ));
+        
+
+        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
+
+        inputPaths.push({
+          points: points,
+          numWires: 4
+        });
+
+
+        var points = [];
+        points.push( new THREE.Vector3(  10 , 0 , -9 ));
+        points.push( new THREE.Vector3(  10 , 0 , -8 ));
+        points.push( new THREE.Vector3(  10 , 0 , -7 ));
+        points.push( new THREE.Vector3(  10 , 0 , -3 ));
+        
+
+        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
+
+        inputPaths.push({
+          points: points,
+          numWires: 4
+        });
+
+
+
+        // Output PAth
+        var points = [];
+
+        points.push( new THREE.Vector3( 0 , 0 , 0 ));
+        points.push( new THREE.Vector3( 0 , 0 , 4 ));
+        points.push( new THREE.Vector3( 2 , 0 , 6 ));
+        points.push( new THREE.Vector3( 2 , 0 , 7 ));
+        points.push( new THREE.Vector3( 2 , 0 , 8 ));
+        points.push( new THREE.Vector3( 0 , 0 , 9 ));
+        points.push( new THREE.Vector3( 0 , 0 , 11 ));
+
+        var output = {
+          points: points,
+          numWires:0
+        }
+
+
+        var paths = new PathConnector( inputPaths , output , xWidth , 1 );
+
+        paths.body.position.y = -.5;
+        scene.add( paths.body );
+
+
+
+
+
+
+
+
+      }
+
+      
+      function animate(){
+
+        requestAnimationFrame( animate );
+       
+        uniforms.dT.value = clock.getDelta();
+        uniforms.time.value += uniforms.dT.value;
+
+        controls.update();
+        //audio.update();
+        
+        renderer.render( scene , camera );
+
+      }
+
+
+      function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+
+    </script>
+
+  </body>
+</html>
