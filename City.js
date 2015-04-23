@@ -11,45 +11,58 @@ function City( batteryPosition , x ){
 
 	this.numOfRows = 6;
 	
-	var connectionPaths = [];
-	var completedPaths = [];
-	var buildingPositions = [];
-
-	for( var i = 0; i < this.numOfRows; i++ ){
-
-		var start = new THREE.Vector3( .6 , 0 ,  i * this.spaceBetweenRows );
-		var end = new THREE.Vector3( .3 - ( i * this.xWidth * this.rowLength), 0 , i * this.spaceBetweenRows );	
-		var row = this.createRow( i , start , end  );
-
-		connectionPaths.push( row.outputPath );
-		completedPaths = completedPaths.concat( row.inputPaths );
-		buildingPositions = buildingPositions.concat( row.buildingPositions );
-
-	}
-
-	var finalC = [];
-	finalC.push( new THREE.Vector3(  .3 - this.xWidth * this.rowLength , 0 , 0 ))
-	finalC.push( new THREE.Vector3(  0 , 0 , -1 ))
-	finalC.push( new THREE.Vector3(  0 , 0 , -1.1 ))
+	this.completedPaths = [];
+	this.connectionPaths = [];
+	this.buildingPositions = [];
 
 
 
-	var finalConnect = { points: finalC }
-	var connected = new PathConnector( connectionPaths , finalConnect , this.xWidth , .1 , 0 )
+	var connected = this.createChunk( new THREE.Vector3()  , 0 );//new PathConnector( connectionPaths , finalConnect , this.xWidth , .1 , 0 )
 
-	completedPaths = completedPaths.concat( connected.inputPaths );
-	completedPaths = completedPaths.concat([ connected.outputPath ]);
+	this.completedPaths = this.completedPaths.concat( connected.inputPaths );
+	this.completedPaths = this.completedPaths.concat([ connected.outputPath ]);
 
-	this.buildings = this.createBuildingMesh( buildingPositions );
+	this.buildings = this.createBuildingMesh( this.buildingPositions );
 	
-	var paths = row.inputPaths.concat([ row.outputPath ]);
 
-	var wireInfo = new Wire( completedPaths ,  this.xWidth );
+
+	var wireInfo = new Wire( this.completedPaths ,  this.xWidth );
 	this.wires = wireInfo.wire;
 	this.debug = wireInfo.debug;
 
 	//this.buildings = this.createBuildingMesh( row.buildingPositions );
 	
+
+}
+
+City.prototype.createChunk = function( start , startID ){
+
+	var connectionPaths = [];
+
+	for( var i = 0; i < this.numOfRows; i++ ){
+
+		var start = new THREE.Vector3(.6 , 0 ,  i * this.spaceBetweenRows );
+		var end = new THREE.Vector3( .3 - ( i * this.xWidth * this.rowLength ), 0 , i * this.spaceBetweenRows );	
+		var row = this.createRow( i + startID , start , end  );
+
+		connectionPaths.push( row.outputPath );
+		this.completedPaths = this.completedPaths.concat( row.inputPaths );
+		this.buildingPositions = this.buildingPositions.concat( row.buildingPositions );
+
+	}
+
+	var finalC = [];
+	//finalC.push( new THREE.Vector3(  .3, 0 , 0 ))
+	finalC.push( new THREE.Vector3(  .33 , 0 , -this.spaceBetweenRows * .9 ))
+	finalC.push( new THREE.Vector3(  .33 , 0 , -this.spaceBetweenRows ))
+	//finalC.push( new THREE.Vector3(  0 , 0 , -1.1 ))
+
+
+
+	var finalConnect = { points: finalC }
+	var connected = new PathConnector( connectionPaths , finalConnect , this.xWidth , .1 , startID );
+
+	return connected;
 
 }
 
@@ -69,7 +82,7 @@ City.prototype.createBuildingMesh = function( buildingPositions ){
 		m.position.copy( buildingPositions[i] );
 		
 
-		m.scale.y *= (Math.random()+ .5)
+		m.scale.y *= (Math.random() * 5 + .1)
 		m.position.y +=  m.scale.y * bs/ 2;
 		m.updateMatrix();
 
@@ -118,7 +131,7 @@ City.prototype.createRow = function( rowNumber , start , end ){
 	// how many buildings have already been created
 	var baseID = this.rowLength * rowNumber;
 
-	var connected = new PathConnector( buildingPaths , connectionPath , this.xWidth , .1 , rowNumber * this.rowLength )
+	var connected = new PathConnector( buildingPaths , connectionPath , this.xWidth , .1 , baseID )
 
 
 	return{ 
