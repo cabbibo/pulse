@@ -21,11 +21,12 @@ function Path( points ,  wires, xWidth , baseID ){
     attributes:{ id:{type:"f" , value:null} },
     vertexShader: shaders.vs.pathDebug,
     fragmentShader: shaders.fs.pathDebug,
+    linewidth: 10
 
   });
 
   this.debug = new THREE.Line( this.debugGeo , mat , THREE.LinePieces )
-  //this.body.add( this.debug );
+  this.body.add( this.debug );
 
 
   var mat = new THREE.ShaderMaterial({
@@ -34,6 +35,7 @@ function Path( points ,  wires, xWidth , baseID ){
     attributes:{ id:{type:"f" , value:null} },
     vertexShader: shaders.vs.path,
     fragmentShader: shaders.fs.path,
+
 
   });
 
@@ -63,15 +65,6 @@ Path.prototype.createGeometry = function( numWires ){
       var dU = this.directions[ j + 1 ];
       var p = this.points[ j ];
       var pU = this.points[ j + 1 ];
-
-      var ratio = d.x / d.z;
-      var ratioU = dU.x / dU.z;
-
-      var x = this.xWidth * i;
-      var z = this.xWidth * i / ratio;
-
-      var xU = this.xWidth * i;
-      var zU = this.xWidth * i / ratioU;
 
       var nP = this.getPosAlongDir( p , d , this.xWidth , i );
       var nPU = this.getPosAlongDir( pU , dU , this.xWidth , i );
@@ -111,9 +104,14 @@ Path.prototype.createGeometry = function( numWires ){
 Path.prototype.getPosAlongDir = function( position , direction , xWidth , i ){
 
   var v = new THREE.Vector3();
+  
   var ratio = direction.x / direction.z;
-  v.x = position.x + xWidth * i;
-  v.z = position.z + (xWidth * i / ratio );
+
+  var add = direction.clone();
+  add.multiplyScalar( xWidth * i );
+  v.add( add );
+  v.add( position )
+ 
 
   return v;
 
@@ -126,15 +124,22 @@ Path.prototype.createDebugGeometry = function(){
 
   var v1 = new THREE.Vector3();
   
-  var totalVerts = ( this.points.length - 1 ) * 2 * 2;
+  var totalVerts =  this.points.length * 2 * 2;
 
   var posArray = new Float32Array( totalVerts * 3 );
   var idArray  = new Float32Array( totalVerts );
 
-  for( var i = 0; i < ( this.points.length - 1 ); i++ ){
+  for( var i = 0; i < this.points.length ; i++ ){
 
     var p = this.points[i];
     var pUp = this.points[ i + 1 ];
+    if( i == this.points.length - 1 ){
+      pUp = this.points[i - 1 ].clone();
+      pUp.sub( p );
+      pUp.multiplyScalar( -1 );
+      pUp.add( p );
+    }
+
     var d = this.directions[i];
    
     // 2 for direction
@@ -265,18 +270,30 @@ Path.prototype.getDirections = function( points ){
       
       if( up == true ){
 
-        direction.copy( v2 );
+       // console.log( 'UP')
+        direction.copy( v2.sub( p ) );
+
+        direction.normalize();
+        //direction.set( 0 , 0 , 1 );
+
         angle = Math.PI / 2;
 
       }else{
 
-        direction.copy( v1 );
+
+        direction.copy( v1.sub( p));
         direction.multiplyScalar( -1 );
-        angle = - Math.PI / 2;
+        direction.normalize();
+
+       // direction.multiplyScalar( -1 );
+ 
 
       }
 
     }
+
+    upVec.set( 0 , 1 , 0 );
+
 
     direction.applyAxisAngle( upVec , Math.PI / 2 );
 

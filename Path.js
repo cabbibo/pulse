@@ -75,13 +75,17 @@ Path.prototype.getDirections = function( points ){
       if( up == true ){
 
         direction.copy( v2 );
-        angle = Math.PI / 2;
+        direction.sub( p );
+        direction.normalize();
+        //angle = Math.PI / 2;
 
       }else{
 
         direction.copy( v1 );
+        direction.sub( p );
         direction.multiplyScalar( -1 );
-        angle = - Math.PI / 2;
+        direction.normalize();
+        //angle = - Math.PI / 2;
 
       }
 

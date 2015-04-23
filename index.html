@@ -20,10 +20,20 @@
     <script src = "UserAudio.js"                    ></script>
     <script src = "Stream.js"                       ></script>
 -->
+    
 
     <script src = "Path.js"                         ></script>
     <script src = "PathConnector.js"                ></script>
     <script src = "Wire.js"                         ></script>
+ 
+    <script src = "initDemoPath.js"                 ></script>
+
+  
+
+    <!-- just for right now -->
+  
+ 
+    <!--<script src = "BodyPath.js"                     ></script>-->
     <script src = "City.js"                         ></script>
 
 
@@ -91,6 +101,7 @@
 
         camera = new THREE.PerspectiveCamera( 65 , w/h , .001 , 100 );
         camera.position.z = 2;
+        camera.position.y = 4;
 
         scene = new THREE.Scene();
 
@@ -108,152 +119,14 @@
         controls = new THREE.TrackballControls( camera );
 
 
-        var xWidth = .07;    
-
-        var allPaths = []; 
-
-        var inputPaths = []
-
-        var points = [];
-        points.push( new THREE.Vector3( -3 , 0 , -9 ));
-        points.push( new THREE.Vector3( -3 , 0 , -6 ));
-
-
-        inputPaths.push({
-
-          points: points,
-          numWires: 3
-
-        });
-
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  3 , 0 , -9 ));
-        points.push( new THREE.Vector3(  3 , 0 , -9 ));
-
-        
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  5 , 0 , -9 ));
-        points.push( new THREE.Vector3(  5 , 0 , -6 ));
-        
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  10 , 0 , -9 ));
-        points.push( new THREE.Vector3(  10 , 0 , -3 ));
-        
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-
-        // Output PAth
-        var points = [];
-
-        points.push( new THREE.Vector3( 0 , 0 , 0 ));
-        points.push( new THREE.Vector3( 0 , 0 , 4 ));
-        points.push( new THREE.Vector3( 2 , 0 , 6 ));
-        points.push( new THREE.Vector3( 2 , 0 , 7 ));
-        points.push( new THREE.Vector3( 2 , 0 , 8 ));
-        points.push( new THREE.Vector3( 0 , 0 , 9 ));
-        points.push( new THREE.Vector3( 0 , 0 , 11 ));
-
-        var output = {
-          points: points,
-          numWires:0
-        }
-
-
-        var paths = new PathConnector( inputPaths , output , xWidth , 1 , 0 );
-
-
-        for( var  i = 0; i < paths.inputPaths.length; i++ ){
-          allPaths.push( paths.inputPaths[i] )
-        }
-
-
-        inputPaths = [];
-        inputPaths.push( paths.outputPath );
-
-
-
-        // Output PAth
-        var points = [];
-
-        points.push( new THREE.Vector3( 6 , 0 , 0 ));
-        points.push( new THREE.Vector3( 6 , 0 , 4 ));
-        points.push( new THREE.Vector3( 6 , 0 , 6 ));
-        points.push( new THREE.Vector3( 8 , 0 , 7 ));
-        points.push( new THREE.Vector3( 8 , 0 , 8 ));
-        points.push( new THREE.Vector3( 6 , 0 , 9 ));
-        points.push( new THREE.Vector3( 6 , 0 , 11 ));
-
-        inputPaths.push({
-          points: points,
-          numWires:8
-        });
-
-
-        // Output PAth
-        var points = [];
-
-        points.push( new THREE.Vector3( 3 , 0 , 14 ));
-        points.push( new THREE.Vector3( 3 , 0 , 16 ));
-        points.push( new THREE.Vector3( 3 , 0 , 18 ));
-        points.push( new THREE.Vector3( 6 , 0 , 20 ));
-        points.push( new THREE.Vector3( 6 , 0 , 22 ));
-        points.push( new THREE.Vector3( 3 , 0 , 24 ));
-        points.push( new THREE.Vector3( 3 , 0 , 26 ));
-
-        output =  {
-          points: points,
-          numWires:8
-        };
-
-        var paths = new PathConnector( inputPaths , output , xWidth , 1 , 0 );
-
-        for( var  i = 0; i < paths.inputPaths.length; i++ ){
-          allPaths.push( paths.inputPaths[i] )
-        }
-
-        allPaths.push( paths.outputPath )
-
-        console.log( allPaths )
-
-        var wire = new Wire( allPaths , xWidth );
-        wire.position.y = -.5;
-        console.log( wire );
-        scene.add( wire );
-
-
-
 
         var city = new City();
         scene.add( city.buildings );
+        scene.add( city.wires );
+        scene.add( city.debug );
+        city.debug.position.y = -.1;
 
-
-
+        //initDemoPath();
 
       }
 
