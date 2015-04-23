@@ -40,8 +40,6 @@ Wire.prototype.createGeometry = function( paths , xWidth){
 	var v2 = new THREE.Vector3();
 
 	for( var i = 0; i < paths.length; i++ ){
-		console.log( paths[i].points.length );
-		console.log( paths[i].numWires );
 		totalVerts += (paths[i].points.length-1) * paths[i].numWires * 2;
 	}
 

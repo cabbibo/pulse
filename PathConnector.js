@@ -88,8 +88,6 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 		p.directions[ p.directions.length - 1 ] = opPath.directions[0];
 	}
 
-	//paths.push( opPath );
-	console.log( opPath )
 	return {
 		inputPaths: paths,
 		outputPath: opPath
