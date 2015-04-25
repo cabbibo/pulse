@@ -11,7 +11,7 @@ vec3 hsv(float h, float s, float v)
 void main(){
 	
 
-	vec3 col = hsv( abs(cos(vID*31.2369)) , 1. ,1.);
+	vec3 col = hsv( abs(cos(vID*.1)) , 1. ,1.);
 
 
 	gl_FragColor = vec4( col , 1. );

@@ -13,7 +13,7 @@ function Wire( paths  , xWidth ){
 
 	var wire = new THREE.Line( geo , mat , THREE.LinePieces );
 
-	var geo = this.createDebugGeometry( paths );
+	var geo = this.createDebugGeometry( paths , .1 );
 	var mat = new THREE.ShaderMaterial({
 
 	    uniforms: {},
@@ -40,7 +40,7 @@ Wire.prototype.createGeometry = function( paths , xWidth){
 	var v2 = new THREE.Vector3();
 
 	for( var i = 0; i < paths.length; i++ ){
-		totalVerts += (paths[i].points.length-1) * paths[i].numWires * 2;
+		totalVerts += ( paths[i].points.length-1) * paths[i].numWires * 2;
 	}
 
 	var posArray = new Float32Array( totalVerts * 3 );
@@ -60,11 +60,15 @@ Wire.prototype.createGeometry = function( paths , xWidth){
 
   			var p = path.points[k];
   			var pU = path.points[k+1];
-  			var d = path.directions[k];
-  			var dU = path.directions[k+1];
 
-			this.setPosAlongDir( v1 , p , d , xWidth , j );
-			this.setPosAlongDir( v2 , pU , dU , xWidth , j );
+			var t =  path.tangents[k];
+  			var tU = path.tangents[k+1];
+
+  			var b =  path.bisectors[k];
+  			var bU = path.bisectors[k+1];
+
+			this.setPosAlongDir( v1 , p , b , t , xWidth , j );
+			this.setPosAlongDir( v2 , pU , bU , tU , xWidth , j );
 
 			posArray[ vIndex + 0 ] = v1.x;
 			posArray[ vIndex + 1 ] = 0;
@@ -99,7 +103,7 @@ Wire.prototype.createGeometry = function( paths , xWidth){
 
 }
 
-Wire.prototype.createDebugGeometry = function( paths ){
+Wire.prototype.createDebugGeometry = function( paths , size ){
 
 	var totalVerts = 0;
 
@@ -107,7 +111,7 @@ Wire.prototype.createDebugGeometry = function( paths ){
 	var v2 = new THREE.Vector3();
 
 	for( var i = 0; i < paths.length; i++ ){
-		totalVerts += paths[i].points.length * 4;
+		totalVerts += paths[i].points.length * 6;
 	}
 
 	var posArray = new Float32Array( totalVerts * 3 );
@@ -123,55 +127,62 @@ Wire.prototype.createDebugGeometry = function( paths ){
 
   			vIndex = index * 3;
 
-  			var p = path.points[j];
+  			var p  = path.points[j];
   			var pU = path.points[j+1];
 
-  			if( j == path.points.length - 1 ){
-		      pU = path.points[j - 1 ].clone();
-		      pU.sub( p );
-		      pU.multiplyScalar( -1 );
-		      pU.add( p );
-		    }
+  			var d  = path.directions[j];
+  			var b  = path.bisectors[j];
+  			var t  = path.tangents[j];
 
-  			var d = path.directions[j];
-  	
 
-			v1.copy( pU );
-		    v1.sub( p);
-		    v1.normalize();
-		    v1.multiplyScalar( .5 );
-		    v1.add( p );
+  			var fd  = p.clone().add( d.clone().multiplyScalar( size ) );
+  			var fb  = p.clone().add( b.clone().multiplyScalar( size ) );
+  			var ft  = p.clone().add( t.clone().multiplyScalar( size ) );
 
-		    //direction
+
+		    // Direction
 		    posArray[ vIndex + 0  ] =  p.x; 
 		    posArray[ vIndex + 1  ] =  p.y; 
 		    posArray[ vIndex + 2  ] =  p.z; 
 
-		    posArray[ vIndex + 3  ] =  v1.x; 
-		    posArray[ vIndex + 4  ] =  v1.y; 
-		    posArray[ vIndex + 5  ] =  v1.z;
+		    posArray[ vIndex + 3  ] =  fd.x; 
+		    posArray[ vIndex + 4  ] =  fd.y; 
+		    posArray[ vIndex + 5  ] =  fd.z;
 
 		    idArray[ index + 0 ] = 0;
 		    idArray[ index + 1 ] = 0;
 
 		    v1.copy( p );
 		    d.normalize();
-		    d.multiplyScalar( .5 );
+		    d.multiplyScalar( size );
 		    v1.add( d );
 
-		    //normal
+		    // Bisector
 		    posArray[ vIndex + 6  ] =  p.x; 
 		    posArray[ vIndex + 7  ] =  p.y; 
 		    posArray[ vIndex + 8  ] =  p.z; 
 
-		    posArray[ vIndex + 9  ] =  v1.x; 
-		    posArray[ vIndex + 10 ] =  v1.y; 
-		    posArray[ vIndex + 11 ] =  v1.z; 
+		    posArray[ vIndex + 9  ] =  fb.x; 
+		    posArray[ vIndex + 10 ] =  fb.y; 
+		    posArray[ vIndex + 11 ] =  fb.z; 
 
 		    idArray[ index + 2 ] = 1;
 		    idArray[ index + 3 ] = 1;
 
-  			index += 4;
+
+		    // Tangent
+		    posArray[ vIndex + 12 ] =  p.x; 
+		    posArray[ vIndex + 13 ] =  p.y; 
+		    posArray[ vIndex + 14 ] =  p.z;
+
+		    posArray[ vIndex + 15 ] =  ft.x; 
+		    posArray[ vIndex + 16 ] =  ft.y; 
+		    posArray[ vIndex + 17 ] =  ft.z; 
+
+		    idArray[ index + 4 ] = 2;
+		    idArray[ index + 5 ] = 2;
+
+  			index += 6;
 
   			
   		}
@@ -195,14 +206,17 @@ Wire.prototype.createDebugGeometry = function( paths ){
 
 // v = vector to set
 // p = position start
-// d = direction 
+
+// b = bisector
+// t = tangent
 // w = xWidth
 // i = wire index
-Wire.prototype.setPosAlongDir = function( v , p , d , w , i ){
+Wire.prototype.setPosAlongDir = function( v , p , b , t , w , i ){
 
-  var ratio = d.x / d.z;
+  var dot = b.dot( t );
+
   v.copy( p );
-  v.add( d.clone().normalize().multiplyScalar( w * i ));
+  v.add( b.clone().normalize().multiplyScalar( w * i  * 1 / dot ));
   //v.x = p.x + w * i;
   //v.z = p.z +( w * i / ratio );
 

@@ -29,13 +29,13 @@
     <script src = "initDemoPath.js"                 ></script>
 
   
+    <script src = "RecursiveConnector.js"           ></script>
 
     <!-- just for right now -->
   
- 
     <!--<script src = "BodyPath.js"                     ></script>-->
     <script src = "City.js"                         ></script>
-
+    <script src = "TestPath.js"                     ></script>
 
     <script>
 
@@ -122,10 +122,16 @@
 
         var city = new City();
         scene.add( city.buildings );
-        scene.add( city.wires );
-        //scene.add( city.debug );
+        scene.add( city.wire );
+        scene.add( city.debug );
         city.debug.position.y = -.1;
 
+
+        /*var xWidth = .1;
+        var paths = RecursiveConnector( TestPath() , xWidth , 0 );
+        var wireInfo = new Wire( paths ,  xWidth );
+
+        scene.add( wireInfo.wire );*/
         //initDemoPath();
 
       }

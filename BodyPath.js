@@ -171,8 +171,6 @@ Path.prototype.createDebugGeometry = function(){
 
     v1.copy( p );
     d.normalize();
-    //v1.sub( p );
-    //v1.normalize();
     d.multiplyScalar( .5 );
     v1.add( d );
 
