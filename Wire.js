@@ -1,6 +1,6 @@
-function Wire( paths  , xWidth ){
+function Wire( paths ){
 
-	var geo = this.createGeometry( paths , xWidth );
+	var geo = this.createGeometry( paths );
 
 	var mat = new THREE.ShaderMaterial({
 
@@ -32,7 +32,7 @@ function Wire( paths  , xWidth ){
 
 }
 
-Wire.prototype.createGeometry = function( paths , xWidth){
+Wire.prototype.createGeometry = function( paths ){
 
 	var totalVerts = 0;
 
@@ -54,37 +54,59 @@ Wire.prototype.createGeometry = function( paths , xWidth){
 
 		for( var j = 0; j < path.numWires; j++ ){
 
-  		for( var k = 0; k < path.points.length -1; k++){
+	  		for( var k = 0; k < path.points.length -1; k++){
 
-  			vIndex = index * 3;
+	  			vIndex = index * 3;
 
-  			var p = path.points[k];
-  			var pU = path.points[k+1];
 
-			var t =  path.tangents[k];
-  			var tU = path.tangents[k+1];
+	  			var p = path.points[k];
+	  			var pU = path.points[k+1];
 
-  			var b =  path.bisectors[k];
-  			var bU = path.bisectors[k+1];
+				var t =  path.tangents[k];
+	  			var tU = path.tangents[k+1];
 
-			this.setPosAlongDir( v1 , p , b , t , xWidth , j );
-			this.setPosAlongDir( v2 , pU , bU , tU , xWidth , j );
+	  			var b =  path.bisectors[k];
+	  			var bU = path.bisectors[k+1];
 
-			posArray[ vIndex + 0 ] = v1.x;
-			posArray[ vIndex + 1 ] = 0;
-			posArray[ vIndex + 2 ] = v1.z;
+				this.setPosAlongDir( v1 , p , b , t , path.wireSpacing , j * path.rightHanded );
 
-			posArray[ vIndex + 3 ] = v2.x;
-			posArray[ vIndex + 4 ] = 0;
-			posArray[ vIndex + 5 ] = v2.z;
 
-			idArray[ index + 0 ] = j + path.baseID;
-			idArray[ index + 1 ] = j + path.baseID;
+				// Makes sure that we place vertices according to the 'space between wires'
+				// of the correct path. If we have an output path, we want to make sure that
+				// we connect the paths accurately
+				if( k + 1 < path.points.length - 1 || !path.outputPath ){
 
-  			index += 2;
+					//console.log( 'WS1 : ' + path.wireSpacing)
+					this.setPosAlongDir( v2 , pU , bU , tU , path.wireSpacing , j  * path.rightHanded );
 
-  			
-  		}
+				}else{
+
+					var opBi = path.outputPath.bisectors[0];
+					var opTan = path.outputPath.tangents[0];
+					var dot = opBi.dot( opTan )
+
+			
+
+					//console.log( 'WS2 : ' + path.outputPath.wireSpacing)
+					this.setPosAlongDir( v2 , pU , opBi , opTan , dot * path.outputPath.wireSpacing ,  j * path.outputPath.rightHanded  );
+
+				}
+
+				posArray[ vIndex + 0 ] = v1.x;
+				posArray[ vIndex + 1 ] = 0;
+				posArray[ vIndex + 2 ] = v1.z;
+
+				posArray[ vIndex + 3 ] = v2.x;
+				posArray[ vIndex + 4 ] = 0;
+				posArray[ vIndex + 5 ] = v2.z;
+
+				idArray[ index + 0 ] = j + path.baseID;
+				idArray[ index + 1 ] = j + path.baseID;
+
+	  			index += 2;
+
+	  			
+	  		}
 
 		}
 

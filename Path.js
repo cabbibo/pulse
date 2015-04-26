@@ -1,10 +1,15 @@
-function Path( points , numWires , baseID ){
+function Path( points , numWires , baseID , wireSpacing , outputPath , rightHanded ){
 
   this.upVec = new THREE.Vector3( 0 , 1 , 0 );
 
   this.points = points;
   this.numWires = numWires;
   this.baseID = baseID;
+
+  this.wireSpacing = wireSpacing;
+  this.outputPath = outputPath;
+  //console.log( 'right: ' + rightHanded )
+  this.rightHanded = rightHanded || 1;
 
   // console.log( this.points );
 

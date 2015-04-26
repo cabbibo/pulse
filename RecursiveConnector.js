@@ -1,13 +1,15 @@
-function RecursiveConnector( pathList , xWidth ,  baseID ){
+function RecursiveConnector( pathList , baseID ){
 
 	var finishedWires = [];
 	var baseID = baseID || 0;
-	var xWidth = xWidth || .1;
+
+	var basePaths = [];
 
 	var percolate = function( pl , lor , baseID ){
 
 		var tmpBase = baseID;
 		var connections = [];
+
 
 		for( var i = 0; i < pl.inputs.length; i++ ){
 
@@ -17,6 +19,7 @@ function RecursiveConnector( pathList , xWidth ,  baseID ){
 			if( p.numWires ){
 				
 				connections.push( p );
+				basePaths.push( p );
 				tmpBase += p.numWires;
 			
 			// Need to dig further!
@@ -33,14 +36,26 @@ function RecursiveConnector( pathList , xWidth ,  baseID ){
 
 		pl.bufferSize = pl.bufferSize || .1;
 
-		var connection = PathConnector( connections , pl.output , xWidth ,  pl.bufferSize , baseID )
+
+		var connection = PathConnector( 
+			connections , 
+			pl.output , 
+			pl.output.wireSpacing ,  
+			pl.bufferSize , 
+			baseID , 
+			pl.output.rightHanded 
+		)
 
 		finishedWires = finishedWires.concat( connection.inputPaths )
 
-		return {
+		var toReturn = {
 			output: connection.outputPath,
-			input:  connection.inputPaths
-		}
+			input:  connection.inputPaths,
+			basePaths : basePaths
+		};
+
+
+		return toReturn
 
 	}
 
@@ -48,7 +63,11 @@ function RecursiveConnector( pathList , xWidth ,  baseID ){
 
 	finishedWires = finishedWires.concat( [ final.output ] )
 		
-	return finishedWires;
+	return {
+		finishedWires:finishedWires,
+		basePaths: basePaths,
+		output: final.output
+	}
 
 }
 

@@ -2,7 +2,10 @@
 
 // Takes multiply input path
 // and alters them so that they connect to an output path
-function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID ){
+function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID , rightHanded ){
+
+
+	//console.log( 'xWidth : ' + xWidth );
 
 	//TODO: should we try and always make the wires set apart?
 
@@ -13,15 +16,12 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 	// i = wire index
 	var setPosAlongDir = function( v , p , d , w , i ){
 
-	  var ratio = d.x / d.z;
 	  v.copy( p );
 	  v.add( d.clone().normalize().multiplyScalar( w * i ) );
-	  //v.x = p.x + w * i;
-	  //v.z = p.z +( w * i / ratio );
 
 	}
 
-	
+
 
 
 	// Add to the total wires, so that we 
@@ -31,7 +31,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 	var paths = [];
 
 	// Getting path at beginning
-	var opPath = new Path( output.points , 0 , baseID );
+	var opPath = new Path( output.points , 0 , baseID , xWidth , undefined , rightHanded );
 
 
 	// Get our final output direction and tangent
@@ -52,9 +52,9 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 
 		var cp = connectionPaths[i];
 
-		var buffer = output.points[0].clone();
+		var buffer = opPath.points[0].clone();
 
-		var dirVec = output.points[0].clone();
+		var dirVec = opPath.points[0].clone();
 		dirVec.sub( cp.points[ cp.points.length-1 ]);
 
 
@@ -87,8 +87,9 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 			var pos = pDown.points[ pDown.points.length - 2 ];
 			var dir = pDown.bisectors[ pDown.points.length - 2 ];
 
-
-			setPosAlongDir( buffer , pos , dir , xWidth , pDown.numWires );
+			dot = pDown.bisectors[ pDown.points.length - 2 ].dot( pDown.tangents[ pDown.points.length - 2])
+			//console.log( dot )
+			setPosAlongDir( buffer , pos , dir ,  pDown.wireSpacing / dot , pDown.numWires * rightHanded );
 
 		}
 
@@ -98,22 +99,29 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 
 		var connection = output.points[0].clone();
 
-
+		//dot = pDown.bisectors[ pDown.points.length - 2 ].dot( pDown.tangents[ pDown.points.length - 2])
 		// makes sure that we place these connection wires along the proper
 		// so the points *exactly* match the locations of the wires of the
 		// connection path
-		setPosAlongDir( connection , pos , dir , xWidth , totalWires  );
+		setPosAlongDir( connection , pos , dir , xWidth , totalWires * rightHanded  );
 
 		// Now that we have these new points
 		// push them to the points of the connection path
 		cp.points.push( buffer );
 		cp.points.push( connection );
 
+	
+
+
+		//console.log( 'wireSpacing : ' + cp.wireSpacing )
+
+
 		// Now we can get a new path, that will give us the 
 		// proper directions for the new points
-		var p = new Path( cp.points , cp.numWires , totalWires + baseID );
+		var p = new Path( cp.points , cp.numWires , totalWires + baseID , cp.wireSpacing , opPath , cp.rightHanded );
 
-		//p.directions[ p.directions.length - 1 ] =
+		p.bisectors[ p.directions.length - 1 ] = dir;
+
 		paths.push( p );
 
 		// Adding more wires, so the next connector
@@ -134,6 +142,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 	}
 
 
+	// Remember: our opPath doesn't have a next path yet!
 	// Return the altered input paths
 	// and the output path, which now has an assigned wire number
 	return {

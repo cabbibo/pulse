@@ -4,7 +4,7 @@ void main(){
 	
 
 	float val = 1.;
-	
+
 	vec3 col = vec3( val , 0. , 0. );
 	
 	if( vID > .5 && vID < 1.5 ){
