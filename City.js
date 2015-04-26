@@ -1,24 +1,30 @@
 function City( batteryPosition , x ){
 
 
+	//this.sbw = .01;	
+	this.spaceBetweenWires = .0002;
+	this.sbw = this.spaceBetweenWires;
 
-	this.spaceBetweenRows = .3;
-	this.buildingSize = .1;
-	this.spaceBetweenBuildings = .2;
+	this.spaceBetweenRows = .08;
+	this.buildingSize = .04;
+	this.spaceBetweenBuildings = .06;
 
-	this.buildingsInRow = 6;
-	this.rowsInChunk = 6;
+	this.buildingsInRow = 4;
+	this.rowsInChunk = 4;
+
+	this.spaceBetweenChunks = this.spaceBetweenBuildings * this.buildingsInRow * 1.2;
+	this.chunksInChunkRow = 10;
+
+	this.spaceBetweenChunkRows = .9//this.buildingsInRow * this.rowsInChunk * this.chunksInChunkRow * this.sbw * 4
+	this.chunksInChunkChunk = 6;
 
 
 
-	this.xWidth = .02;	
 	this.wireOffset = .04;
 
-	this.rowWireOffset = .06
-	this.rowEndOffset  = .1;
+	this.rowWireOffset = this.buildingSize * 4.1;
+	this.rowEndOffset  = this.buildingSize * 4.1;
 
-	this.spaceBetweenWires = this.xWidth;
-	this.sbw = this.spaceBetweenWires;
 
 	this.numOfRows = 6;
 	
@@ -29,22 +35,199 @@ function City( batteryPosition , x ){
 	this.buildingPositions = [];
 
 	var basePos = new THREE.Vector3();
-	var rowDir = new THREE.Vector3( 1.5 , 0 , 1 );
-	var endOffset = .1;
-	var wireOffset = .1;
+	var rowDir = new THREE.Vector3( -1 , 0 , 0 );
+	var endOffset = this.buildingSize * 4;
+	var wireOffset = this.buildingSize * 4;
 
-	var pathList = this.createChunk( basePos , rowDir , endOffset , wireOffset );
+	//var pathList = this.createChunk( basePos , rowDir , endOffset , wireOffset );
+
+
+	var endOffset = this.rowsInChunk * this.spaceBetweenRows * 1.1;
+	var wireOffset = this.spaceBetweenBuildings  * this.buildingsInRow;
+	var pathList = this.createCity();
 
 	var buildings = this.createBuildingMesh( this.buildingPositions );
 
-	var paths = RecursiveConnector( pathList , this.xWidth , 0 );
-  var wireInfo = new Wire( paths ,  this.xWidth );
+	var paths = RecursiveConnector( pathList , this.sbw , 0 );
+
+  var wireInfo = new Wire( paths ,  this.sbw );
 
   return {
   	wire: wireInfo.wire,
   	buildings: buildings,
   	debug: wireInfo.debug
   }
+
+}
+
+City.prototype.createCity = function(){
+
+	var outputPath = {points:[]};
+	var inputPaths = [];
+
+	outputPath.points.push( new THREE.Vector3( 0 , 0 , -.1 ))
+	outputPath.points.push( new THREE.Vector3( 0 , 0 , -6))
+
+	outputPath.points.push( new THREE.Vector3( 3 , 0 , -9))
+	outputPath.points.push( new THREE.Vector3( 3 , 0 , -12))
+	outputPath.points.push( new THREE.Vector3( 0 , 0 , -15))
+
+	for( var  i = 0; i < 4; i++){
+
+		var basePos = new THREE.Vector3( .2 , 0 , 4 + i * 6 );
+		var rowDir = new THREE.Vector3( 1, 0 , 0  );
+		var endOffset = this.buildingSize * 4;
+		var wireOffset = this.buildingSize * 4;
+
+		//var pathList = this.createChunk( basePos , rowDir , endOffset , wireOffset );
+
+
+		var endOffset = this.rowsInChunk * this.spaceBetweenRows * 1.1;
+		var wireOffset = this.spaceBetweenBuildings  * this.buildingsInRow + i * this.sbw * this.buildingsInRow * this.rowsInChunk * this.chunksInChunkRow * this.chunksInChunkChunk;
+		var pathList = this.createChunkChunk( basePos , rowDir , endOffset , wireOffset);
+
+		inputPaths.push( pathList );
+
+	}
+
+
+
+
+	return {
+		bufferSize: .6,
+		output: outputPath,
+		inputs: inputPaths
+	}
+
+
+
+}
+City.prototype.createChunkChunk = function( basePos , dir , endOffset , wireOffset ){
+
+	var v1 = new THREE.Vector3();
+
+	var tan = dir.clone();
+	tan.applyAxisAngle( this.upVec , -Math.PI / 2 );
+
+	var outputPath = {points:[]};
+	var inputPaths = [];
+
+	var v = new THREE.Vector3().copy( basePos );
+	
+	v1.copy( dir )
+	v1.multiplyScalar( -wireOffset );
+	v.add( v1 );
+
+	v1.copy( tan );
+	v1.multiplyScalar( 0 );
+	v.add( v1 );
+
+	outputPath.points.push( v );
+
+
+	var v = new THREE.Vector3().copy( basePos );
+	
+	v1.copy( dir )
+	v1.multiplyScalar( -wireOffset );
+	v.add( v1 );
+
+	v1.copy( tan );
+	v1.multiplyScalar( -endOffset );
+	v.add( v1 );
+
+	outputPath.points.push( v );
+
+
+
+
+
+
+	for( var i = 0; i < this.chunksInChunkChunk; i++ ){
+
+		var rowPos = new THREE.Vector3().copy( basePos );
+
+		v1.copy( tan );
+		v1.multiplyScalar( i * this.spaceBetweenChunkRows );
+
+		rowPos.add( v1 );
+
+		//var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.sbw * 1 * this.chunksInChunkRow );
+		var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.rowsInChunk * this.chunksInChunkChunk * this.sbw );
+		var rowWireOffset = this.buildingSize;
+		var row = this.createChunkRow( rowPos , dir.clone().applyAxisAngle( this.upVec , Math.PI / 2) , rowEndOffset , rowWireOffset );
+
+		inputPaths.push( row );
+
+	}
+
+	return {
+		bufferSize: .1,
+		output: outputPath,
+		inputs: inputPaths
+	}
+
+}
+
+
+City.prototype.createChunkRow = function( basePos , dir , endOffset , wireOffset ){
+
+	var v1 = new THREE.Vector3();
+
+	var tan = dir.clone();
+	tan.applyAxisAngle( this.upVec , -Math.PI / 2 );
+
+	var outputPath = {points:[]};
+	var inputPaths = [];
+
+	var v = new THREE.Vector3().copy( basePos );
+	
+	v1.copy( dir )
+	v1.multiplyScalar( -wireOffset );
+	v.add( v1 );
+
+	v1.copy( tan );
+	v1.multiplyScalar( 0 );
+	v.add( v1 );
+
+	outputPath.points.push( v );
+
+
+	var v = new THREE.Vector3().copy( basePos );
+	
+	v1.copy( dir )
+	v1.multiplyScalar( -wireOffset );
+	v.add( v1 );
+
+	v1.copy( tan );
+	v1.multiplyScalar( -endOffset );
+	v.add( v1 );
+
+	outputPath.points.push( v );
+
+
+	for( var i = 0; i < this.chunksInChunkRow; i++ ){
+
+		var rowPos = new THREE.Vector3().copy( basePos );
+
+		v1.copy( tan );
+		v1.multiplyScalar( i * this.spaceBetweenChunks );
+
+		rowPos.add( v1 );
+
+		//var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.sbw * 1 * this.chunksInChunkRow );
+		var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.rowsInChunk * this.sbw );
+		var rowWireOffset = this.buildingSize;
+		var row = this.createChunk( rowPos , dir.clone().applyAxisAngle( this.upVec , Math.PI / 2) , rowEndOffset , rowWireOffset );
+
+		inputPaths.push( row );
+
+	}
+
+	return {
+		bufferSize: .1,
+		output: outputPath,
+		inputs: inputPaths
+	}
 
 }
 
@@ -72,7 +255,6 @@ City.prototype.createChunk = function( basePos , dir , endOffset , wireOffset ){
 	outputPath.points.push( v );
 
 
-
 	var v = new THREE.Vector3().copy( basePos );
 	
 	v1.copy( dir )
@@ -85,6 +267,7 @@ City.prototype.createChunk = function( basePos , dir , endOffset , wireOffset ){
 
 	outputPath.points.push( v );
 
+
 	for( var i = 0; i < this.rowsInChunk; i++ ){
 
 		var rowPos = new THREE.Vector3().copy( basePos );
@@ -94,8 +277,8 @@ City.prototype.createChunk = function( basePos , dir , endOffset , wireOffset ){
 
 		rowPos.add( v1 );
 
-		var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.sbw * .5 );
-		var rowWireOffset = this.spaceBetweenRows * .2
+		var rowEndOffset = wireOffset + ( i * this.buildingsInRow * this.sbw * 1 );
+		var rowWireOffset = ( this.buildingSize / 2 ) + this.spaceBetweenRows * .1
 		var row = this.createRow( rowPos , dir , rowEndOffset , rowWireOffset );
 
 		inputPaths.push( row );
@@ -103,7 +286,7 @@ City.prototype.createChunk = function( basePos , dir , endOffset , wireOffset ){
 	}
 
 	return {
-		bufferSize: .5,
+		bufferSize: .1,
 		output: outputPath,
 		inputs: inputPaths
 	}
@@ -212,7 +395,9 @@ City.prototype.createBuildingMesh = function( buildingPositions ){
 		m.position.copy( buildingPositions[i] );
 		
 
-		m.scale.y *= (Math.random() * 5 + .1)
+		var scaleBase = .4 + Math.pow( buildingPositions[i].x  , 2 ) * 1.;
+
+		m.scale.y *= (Math.random() * scaleBase + scaleBase ) 
 		m.position.y +=  m.scale.y * bs/ 2;
 		m.updateMatrix();
 

@@ -6,8 +6,12 @@ function Path( points , numWires , baseID ){
   this.numWires = numWires;
   this.baseID = baseID;
 
+  // console.log( this.points );
+
   // The important part!
   this.directions = this.getDirections( this.points     );
+
+  // console.log( this.directions )
   this.tangents   = this.getTangents(   this.directions );
   this.bisectors  = this.getBisectors(  this.directions );
 
@@ -95,7 +99,7 @@ Path.prototype.getBisectors = function( directions ){
     bi.applyAxisAngle( this.upVec , -Math.PI / 2 )
 
     bisectors.push( bi );
-    
+
   }
 
   return bisectors

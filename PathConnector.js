@@ -1,3 +1,5 @@
+//TODO: BREAKS WHEN ONLY 1 POINT IS GIVEN IN PATH!
+
 // Takes multiply input path
 // and alters them so that they connect to an output path
 function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID ){
@@ -19,6 +21,8 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 
 	}
 
+	
+
 
 	// Add to the total wires, so that we 
 	// know what the output path number of wires will be.
@@ -39,7 +43,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 	// assigning a temp vec3 to use
 	var v1 = new THREE.Vector3();
 
-	console.log( xWidth )
+
 
 	// For each path, add 2 more points to the path
 	// that connect it to the new path location
@@ -53,7 +57,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 		var dirVec = output.points[0].clone();
 		dirVec.sub( cp.points[ cp.points.length-1 ]);
 
-		console.log( xWidth )
+
 
 		// Offset out buffer position
 		// by the direction of the output
@@ -70,7 +74,7 @@ function PathConnector( connectionPaths , output , xWidth , bufferSize , baseID 
 		v1.multiplyScalar( totalWires * xWidth );
 		buffer.sub( v1 );
 
-		console.log( buffer )
+		//		console.log( buffer )
 
 
 		// Make sure we start at the right offset 
