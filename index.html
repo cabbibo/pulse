@@ -9,56 +9,84 @@
 
   <body>
 
-    <script src = "lib/three.min.js"                ></script>
-    <script src = "lib/jquery.min.js"               ></script>
-    <script src = "lib/underscore.js"               ></script>
 
-    <script src = "lib/ShaderLoader.js"             ></script>
 
-    <script src = "lib/TrackballControls.js"        ></script>
-      
-<!--
-    <script src = "AudioController.js"              ></script>
-    <script src = "UserAudio.js"                    ></script>
-    <script src = "Stream.js"                       ></script>
--->
-    
+    <!-- NOT MINE LIB -->
+    <script src = "lib/three.min.js"                        ></script>
+    <script src = "lib/jquery.min.js"                       ></script>
+    <script src = "lib/underscore.js"                       ></script>
+    <script src = "lib/leap.min.js"                         ></script>
+    <script src = "lib/TrackballControls.js"                ></script>
+        
 
-    <script src = "Path.js"                         ></script>
-    <script src = "PathConnector.js"                ></script>
-    <script src = "Wire.js"                         ></script>
- 
-    <script src = "initDemoPath.js"                 ></script>
+    <!-- MINE LIB -->
+    <script src = "lib/ShaderLoader.js"                     ></script>
+    <script src = "lib/TextCreator.js"                      ></script>
 
+
+    <!-- AUDIO -->     
+    <script src = "AudioController.js"                      ></script>
+    <script src = "UserAudio.js"                            ></script>
+    <script src = "Stream.js"                               ></script>
   
-    <script src = "RecursiveConnector.js"           ></script>
+        
+    <!-- PATHS -->
+    <script src = "path/Path.js"                            ></script>
+    <script src = "path/PathConnector.js"                   ></script>
+    <script src = "path/Wire.js"                            ></script>    
+    <script src = "path/RecursiveConnector.js"              ></script>  
+    <script src = "path/City.js"                            ></script>
+    <script src = "path/TestPath.js"                        ></script>
 
-    <!-- just for right now -->
-  
-    <!--<script src = "BodyPath.js"                     ></script>-->
-    <script src = "City.js"                         ></script>
-    <script src = "TestPath.js"                     ></script>
+
+    <!-- PANNING CONTROLS -->
+    <script src = "leap/LeapFingers.js"                     ></script>
+    <script src = "leap/TouchPlane.js"                      ></script>
+    <script src = "leap/TouchPlaneBody.js"                  ></script>
+    <script src = "leap/PanPlane.js"                        ></script>
+    <script src = "leap/Button.js"                          ></script>
+    <script src = "leap/Slider.js"                          ></script>
 
     <script>
+
+
+
+      var loaded = 0;
+      var neededToLoad = 1;
 
 
       var camera, renderer, scene , controls , clock;
       
       var audioMesh;
 
+      var leap = new Leap.Controller();
+
       // Setting up shaders
       var shaders = new ShaderLoader( 'shaders' );
 
       shaders.shaderSetLoaded = function(){
-        init();
-        animate();
+        onLoad();
       }
 
+
+
+      // WIRES
       shaders.load( 'vs-pathDebug' , 'pathDebug' , 'vertex'   );
       shaders.load( 'fs-pathDebug' , 'pathDebug' , 'fragment' );
 
       shaders.load( 'vs-path' , 'path' , 'vertex'   );
       shaders.load( 'fs-path' , 'path' , 'fragment' );
+
+
+      // PANNING
+      shaders.load( 'vs-topPlane' , 'topPlane' , 'vertex' );
+      shaders.load( 'fs-topPlane' , 'topPlane' , 'fragment' );
+
+      shaders.load( 'vs-button' , 'button' , 'vertex' );
+      shaders.load( 'fs-button' , 'button' , 'fragment' );
+
+      shaders.load( 'vs-slider' , 'slider' , 'vertex' );
+      shaders.load( 'fs-slider' , 'slider' , 'fragment' );
 
 
 
@@ -82,10 +110,16 @@
       var uniforms = {
   
         //;t_audio: { type:"t"  , value : audio.texture },
-        dT:      { type:"f"  , value : 0             },
-        time:    { type:"f"  , value : 0             },
+        dT:      { type: "f"  , value : 0             },
+        time:    { type: "f"  , value : 0             },
+        fingers: { type: "v3" , value : []            },
 
       }
+
+      var G = {};
+
+      G.uniforms = uniforms;
+
 
 
       function init(){
@@ -101,9 +135,11 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 1000 );
-        camera.position.z = 2;
-        camera.position.y = 4;
+        camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 1000 );
+        camera.position.z = .2;
+        camera.position.y = 0.1;
+        camera.lookAt( new THREE.Vector3() );
+
 
         scene = new THREE.Scene();
 
@@ -122,12 +158,65 @@
 
 
 
-        var city = new City();
-        scene.add( city.buildings );
-        scene.add( city.wire );
-        //scene.add( city.debug );
-        city.debug.position.y = -.1;
+        G.city = new City();
+      
 
+        var cityBody = new THREE.Object3D();
+
+        cityBody.add( G.city.buildings );
+        cityBody.add( G.city.wire );
+        cityBody.scale.multiplyScalar( .1 );
+
+        for( var i = 0; i < G.city.batteries.length; i++ ){
+          cityBody.add( G.city.batteries[i] );
+        }
+        
+
+        scene.add( cityBody );
+
+        G.city.body = cityBody;
+
+        //scene.add( city.debug );
+        G.city.debug.position.y = -.1;
+
+
+
+        G.fingers = new LeapFingers();
+
+        G.fingers.addToScene( scene );
+        leap.connect();
+
+
+        var position = new THREE.Vector3(0, 0 , 0);
+        var normal = new THREE.Vector3( 0 , 1 , 0 );
+        var x = 1;
+        var y = 1;
+        var bufferDistance = .03;
+
+        var body = new THREE.Object3D();
+        body.rotation.x = -Math.PI / 2;
+        body.position.y = -.1;
+
+        G.touchPlane = new TouchPlane( 
+          G.fingers.tips , 
+          body,
+          [x,y],
+          bufferDistance 
+        );
+
+        scene.add( G.touchPlane.body )
+
+        touchPlaneBody = new TouchPlaneBody( G.touchPlane );
+
+
+        G.city.body.position.z = -4;
+        G.city.body.rotation.x = Math.PI / 2;
+
+        G.panPlane = new PanPlane( G.city.body , G.touchPlane , true );
+
+        G.panPlane.forceMultiplier = 5;
+        G.panPlane.maxX = 1000;
+        G.panPlane.maxY = 1000;
 
         /*var xWidth = .1;
         var paths = RecursiveConnector( TestPath() , xWidth , 0 );
@@ -146,6 +235,12 @@
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;
 
+        var f = leap.frame();
+
+        G.fingers.update( f );
+        G.touchPlane.update();
+        G.panPlane.update();
+
         controls.update();
         //audio.update();
         
@@ -162,6 +257,17 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
+
+      function onLoad(){
+
+        loaded ++;
+        
+        if( loaded == neededToLoad ){
+          init();
+          animate();
+        }
+
+      }
 
 
 

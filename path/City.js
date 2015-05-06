@@ -7,6 +7,7 @@ function City( params ){
 	this.buildingPositions = [];
 
 	this.v1 = new THREE.Vector3();
+  this.v2 = new THREE.Vector3();
 	this.upVec = new THREE.Vector3( 0 , 1 , 0 );
 
 
@@ -17,79 +18,197 @@ function City( params ){
 
 	var totalWires = 0;
 
-	var pathList = this.createLung();
+	
 
-	var paths = RecursiveConnector( pathList ,  0 );
-
-
-	var buildings = this.createBuildingMesh( paths.basePaths , .5 );
-
-	console.log( paths )
- 	var wireInfo = new Wire( paths.finishedWires );
-
-  return {
-  	wire: wireInfo.wire,
-  	buildings: buildings,
-  	debug: wireInfo.debug
-  }
-
+  return  this.createLung();
 
 }
 
+
 City.prototype.createLung = function(){
 
-	var outputPath  = {
 
-		points:[],
-		wireSpacing: .05,
-		rightHanded: 1,
+  var finishedWires = [];
+  var basePaths = [];
 
-	}
+  var totalWires = 0;
 
-	outputPath.points.push( new THREE.Vector3(10 , 0 , 0))
-
-	outputPath.points.push( new THREE.Vector3(30 , 0 , -40))
-	outputPath.points.push( new THREE.Vector3(30 , 0 , -80))
-
-
-	var inputPaths = [];
-
-	for( var i = 0; i < 4; i++ ){
-		
-		//var t = (-i  / 8 ) * 2 * Math.PI 
-
-		var t = 0;
-		console.log( t )
-		var dir = new THREE.Vector3();
-		dir.x = Math.cos( t );
-		dir.z = Math.sin( t );
-		dir.normalize();
-		console.log( dir )
+  var batteries = [];
 
 
 
-		var bundleOffset = 30 * ( i) + 40;
-		var offset =  i  * 10 + bundleOffset;
 
-		endPosition = new THREE.Vector3( -bundleOffset , 0 , 70 * ( 4 - i)  );
+  var battMat =  new THREE.MeshNormalMaterial();
+	for( var i = 0; i < 12; i++ ){
 
-		var pathList = this.createBoquet( dir , endPosition , offset );
+    var endPositions = [];
 
-		inputPaths.push( pathList )
+    var side = Math.floor(  i  / 4 );
+
+    var rowNum = i % 4;
+
+    var p1 = new THREE.Vector3();
+    var p2 = new THREE.Vector3();
+    var p3 = new THREE.Vector3();
+    var p4 = new THREE.Vector3();
+
+
+    var dir = new THREE.Vector3();
+    var tan = new THREE.Vector3();
+    if( side < 2 ){
+
+      dir.x = side - .5;
+      dir.z = 0;
+      dir.normalize();
+
+      tan.copy( dir );
+      tan.applyAxisAngle( this.upVec ,  dir.x * Math.PI / 2 );
+
+
+    }else{
+
+      dir.x = 0;
+      dir.z = 1;
+      dir.normalize();
+
+      tan.copy( dir );
+      tan.applyAxisAngle( this.upVec ,  Math.PI / 2 );
+
+    }
+
+
+    outNess = rowNum - 1.5;
+    tanAmount = rowNum - 1.5;
+   // outNess = -outNess;
+
+    var sideOffsetSize = 17;
+
+    var sideOffset = side * sideOffsetSize;
+
+    if( side == 2 ){
+      sideOffset = sideOffsetSize;
+    }
+    sideOffset -= sideOffsetSize / 2;
+
+    var startOut = 100;
+    var endOut = 180;
+    var range = endOut - startOut
+
+
+    this.v1.set( 0 , 0 , 0 );
+
+    this.v2.copy( tan );
+    this.v2.multiplyScalar( tanAmount * 40 + outNess * 40 + sideOffset   );
+    this.v1.add( this.v2 );
+
+    this.v2.copy( dir );
+    this.v2.multiplyScalar(( startOut + range * 1)+ 50 * Math.abs( outNess ));
+    this.v1.add( this.v2 );
+    
+    p1.copy( this.v1 );
+
+    this.v1.set( 0 , 0 , 0 );
+
+    this.v2.copy( tan );
+    this.v2.multiplyScalar( tanAmount * 40  + outNess * 40 + sideOffset );
+    this.v1.add( this.v2 );
+
+    this.v2.copy( dir );
+    this.v2.multiplyScalar( ( startOut + range * .6666));
+    this.v1.add( this.v2 );
+    
+    p2.copy( this.v1 );
+
+    this.v1.set( 0 , 0 , 0 );
+
+    this.v2.copy( tan );
+    this.v2.multiplyScalar( tanAmount * 40 + sideOffset  );
+    this.v1.add( this.v2 );
+
+    this.v2.copy( dir );
+    this.v2.multiplyScalar( ( startOut + range * .3333 ));
+    this.v1.add( this.v2 );
+    
+    p3.copy( this.v1 );
+
+
+
+    this.v1.set( 0 , 0 , 0 );
+
+    this.v2.copy( tan );
+    this.v2.multiplyScalar( tanAmount * 40  + sideOffset );
+    this.v1.add( this.v2 );
+
+    this.v2.copy( dir );
+    this.v2.multiplyScalar( ( startOut + range * 0 ) );
+    this.v1.add( this.v2 );
+
+    p4.copy( this.v1 );
+  
+
+
+    endPositions.push( p1 )
+    endPositions.push( p2 )
+    endPositions.push( p3 )
+    endPositions.push( p4 )
+
+    var newDir = new THREE.Vector3();
+    newDir.copy( p4 );
+    newDir.sub( p3 );
+    newDir.normalize();
+
+
+
+		var pathList = this.createBoquet( newDir, endPositions  );
+
+		var paths = RecursiveConnector( pathList , totalWires );
+
+    finishedWires = finishedWires.concat( paths.finishedWires );
+    basePaths = basePaths.concat( paths.basePaths );
+    totalWires + paths.numWires;
+
+    var ySize = 3;
+    var battSize = paths.output.numWires * paths.output.wireSpacing;
+    var geo = new THREE.CubeGeometry(battSize* 1.2, ySize , battSize * 1.2 ) 
+    var battery = new THREE.Mesh( geo  , battMat );
+
+    battery.position.copy( paths.output.points[ paths.output.points.length-1 ] );
+    battery.position.y += ySize / 2.21;
+
+    this.v1.copy( paths.output.bisectors[ paths.output.bisectors.length-1 ] );
+    this.v1.multiplyScalar( battSize * .5 )
+    battery.position.add( this.v1 );
+
+    batteries.push( battery );
+
 
 		//console.log( totalWires )
 	}	
 
-	return {
-		bufferSize: .5,
-		output: outputPath,
-		inputs: inputPaths,
-	}
+  var battSize = 160;
+  var ySize = 10;
+  var geo = new THREE.CubeGeometry(battSize* 1.2, ySize , battSize * 1.2 ) 
+  var battery = new THREE.Mesh( geo  , battMat );
+  battery.position.y += ySize / 2.21;
+
+  batteries.push( battery )
+
+  var buildings = this.createBuildingMesh( basePaths , .5 );
+
+  var wireInfo = new Wire( finishedWires );
+
+  return {
+    wire: wireInfo.wire,
+    buildings: buildings,
+    batteries: batteries,
+    debug: wireInfo.debug
+  }
+
 
 
 }
 
-City.prototype.createBoquet = function( direction , endPosition , offset ){
+City.prototype.createBoquet = function( direction , endPositions ){
 
 	var outputPath  = {
 
@@ -101,11 +220,9 @@ City.prototype.createBoquet = function( direction , endPosition , offset ){
 
 	var tan = this.getTan( direction , 1 );
 
-	var outputPos = endPosition.clone();
-	outputPos.sub( this.v1.copy( direction ).multiplyScalar( offset ))
-	outputPath.points.push( outputPos )
-
-	outputPath.points.push( endPosition )
+  for( var i = 0; i < endPositions.length; i++ ){
+	   outputPath.points.push( endPositions[i] )
+  }
 
 	var inputPaths = [];
 
@@ -119,7 +236,7 @@ City.prototype.createBoquet = function( direction , endPosition , offset ){
 
 
 
-		flowerEndPos = outputPos.clone();
+		flowerEndPos = outputPath.points[0].clone();
 		flowerEndPos.add( this.v1.copy( tan ).multiplyScalar( -10 ))
 		flowerEndPos.add( this.v1.copy( dir ).multiplyScalar( 15  ) );
 
@@ -428,9 +545,9 @@ City.prototype.createBuildingMesh = function( basePaths , bs ){
 		
 
 		var scaleBase = .4 + Math.pow( basePos.x  , 2 ) * 1.;
-		scaleBase = 1.;
+		scaleBase = 3.;
 
-		m.scale.y *= (Math.random() * scaleBase + scaleBase ) 
+		m.scale.y *= (Math.random() * scaleBase * 1 + scaleBase ) 
 		m.position.y +=  m.scale.y * bs/ 2;
 		m.updateMatrix();
 
