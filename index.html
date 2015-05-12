@@ -12,6 +12,9 @@
     <script src = "lib/three.min.js"                ></script>
     <script src = "lib/jquery.min.js"               ></script>
     <script src = "lib/ShaderLoader.js"             ></script>
+    <script src = "lib/VREffect.js"             ></script>
+    <script src = "lib/VRControls.js"             ></script>
+    <script src = "lib/ShaderLoader.js"             ></script>
 
     <script src = "lib/TrackballControls.js"        ></script>
       
@@ -29,6 +32,10 @@
 
 
       var camera, renderer, scene , controls , clock;
+
+      var VR = true
+      var effect;
+      
       
       var audioMesh;
 
@@ -98,6 +105,11 @@
         renderer.setSize( window.innerWidth, window.innerHeight );
 
         document.body.appendChild( renderer.domElement );
+
+
+
+
+
 
         window.addEventListener( 'resize', onWindowResize, false );
 
@@ -217,7 +229,13 @@
         controls.update();
         //audio.update();
         
-        renderer.render( scene , camera );
+
+        if( VR == true ){
+          effect.render( scene, camera );
+        }else{
+          renderer.render( scene , camera );
+        }
+
 
       }
 
