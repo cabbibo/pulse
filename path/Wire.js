@@ -2,11 +2,14 @@ function Wire( paths ){
 
 	var geo = this.createGeometry( paths );
 
+	var vs = shaders.setValue( shaders.vs.path , 'SIZE' , G.fingers.tips.length )
 	var mat = new THREE.ShaderMaterial({
 
-		uniforms: {},
+		uniforms: {
+			touchers:{ type:"v3v", value: G.fingers.tips }
+		},
 		attributes:{ id:{type:"f" , value:null} },
-		vertexShader: shaders.vs.path,
+		vertexShader: vs,
 		fragmentShader: shaders.fs.path,
 
 	});

@@ -19,7 +19,6 @@ function Button( string , size , touchers , body , bufferDistance ){
   var scale = new THREE.Vector2( x , y );
   scale.multiplyScalar( 1 / y );
 
-  var touchers = touchPlane.touchers;
   this.uniforms =  {
 
     touchers:{ type:"v3v" , value: touchers },

@@ -24,6 +24,7 @@ function PanPlane( plane , touchPlane , forceBased ){
   this.maxY  = 5;
 
   this.forceMultiplier = 1.;
+  this.forcePower = 2.;
 
 
   touchPlane.addFirstTouchingEvent( function( e ){
@@ -57,9 +58,10 @@ PanPlane.prototype.update = function(){
   if( this.forceBasedInteraction ){
   
     this.force.set( 0 , 0 , 0 );
-
-    this.force.x = this.dX * this.forceMultiplier;
-    this.force.y = this.dY * this.forceMultiplier;
+    var xSign = this.dX < 0 ? -1 : 1;
+    var ySign = this.dY < 0 ? -1 : 1;
+    this.force.x = xSign * Math.abs( Math.pow( this.dX  , this.forcePower ) ) * this.forceMultiplier;
+    this.force.y = ySign * Math.abs( Math.pow( this.dY  , this.forcePower ) ) * this.forceMultiplier;
 
     this.velocity.add( this.force );
     this.position.add( this.velocity );

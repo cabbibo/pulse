@@ -8,7 +8,7 @@ uniform vec2 scale;
 varying float vDist; // .w is which toucher
 varying vec3 vNorm;
 
-const float bandSize = .99;
+const float bandSize = .9;
 varying vec2 vUv;
 
 void main(){
@@ -28,11 +28,10 @@ void main(){
 		abs( xy.x ) > 1. - ( .02 /  scale.x  ) || 
 		abs( xy.y ) > 1. - ( .02 /  scale.y  )
 	){ 
-		col = vec4( baseCol ,1. ); 
+		//col = vec4( baseCol ,1. ); 
 	}
 
-	//if( x > bandSize || y > bandSize ){ col = vec4( baseCol ,1. ); }
-
+	
 	/*if( vDist < 0. && touching > .5 ){
 		col = vec4( vec3( 1. ) , 1. );
 	}*/
@@ -48,6 +47,9 @@ void main(){
 	//col *= 1.- vDistToPlane;
 
 	//if( vDistToPlane < 0. ){ col = vec4( 1. ); }
+
+	//if( x > bandSize || y > bandSize ){ col = vec4( baseCol ,1. ); }
+
 	gl_FragColor = col;
 
 
