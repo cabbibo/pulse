@@ -2,9 +2,6 @@
 // Does firstTouching get replaced when the first down gets lifted, 
 // but there are still others down? If so, probably take the lowest I 
 // in touching array / compare by touchStartTimes ?
-
-
-
 function TouchPlane( touchers , body , xy , bufferDistance ){
 	
   this.touchers = touchers;

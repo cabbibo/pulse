@@ -1,4 +1,4 @@
-function City( params ){
+function City( size , params , buildingUniforms , wireUniforms ){
 
 	var params = _.defaults( params || {} , {
 		buildingSize: .5
@@ -16,16 +16,14 @@ function City( params ){
 	var finishedWires = [];
 	var buildingPositions = [];
 
-	var totalWires = 0;
+	var totalWires = 0;	
 
-	
-
-  return  this.createLung();
+  return  this.createLung( size , buildingUniforms , wireUniforms );
 
 }
 
 
-City.prototype.createLung = function(){
+City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUniforms ){
 
 
   var finishedWires = [];
@@ -39,33 +37,29 @@ City.prototype.createLung = function(){
 
 
   var battMat =  new THREE.MeshNormalMaterial();
-	for( var i = 0; i < 12; i++ ){
 
-    var endPositions = [];
+
+	for( var i = 0; i < HARDCORD.length; i++ ){
 
     var side = Math.floor(  i  / 4 );
 
     var rowNum = i % 4;
 
-    var p1 = new THREE.Vector3();
-    var p2 = new THREE.Vector3();
-    var p3 = new THREE.Vector3();
-    var p4 = new THREE.Vector3();
 
 
-    var dir = new THREE.Vector3();
-    var tan = new THREE.Vector3();
-    if( side < 2 ){
+    // The direction and tangent of out connection
+    var dir = new THREE.Vector3(1 , 0 , 0);
+    var tan = new THREE.Vector3( 0 ,  0 , 1 );
 
-      dir.x = side - .5;
-      dir.z = 0;
-      dir.normalize();
+    /*dir.x = side - .5;
+    dir.z = 0;
+    dir.normalize();
 
-      tan.copy( dir );
-      tan.applyAxisAngle( this.upVec ,  dir.x * Math.PI / 2 );
+    tan.copy( dir );
+    tan.applyAxisAngle( this.upVec ,  dir.x * Math.PI / 2 );
 
 
-    }else{
+    if( side == 2  ){
 
       dir.x = 0;
       dir.z = 1;
@@ -77,8 +71,10 @@ City.prototype.createLung = function(){
     }
 
 
-    outNess = rowNum - 1.5;
-    tanAmount = rowNum - 1.5;
+    var outNess = rowNum - 1.5;
+    var tanAmount = rowNum - 1.5;
+
+   // var startPos = 
    // outNess = -outNess;
 
     var sideOffsetSize = 17;
@@ -95,71 +91,53 @@ City.prototype.createLung = function(){
     var range = endOut - startOut
 
 
-    this.v1.set( 0 , 0 , 0 );
 
-    this.v2.copy( tan );
-    this.v2.multiplyScalar( tanAmount * 40 + outNess * 40 + sideOffset   );
-    this.v1.add( this.v2 );
 
-    this.v2.copy( dir );
-    this.v2.multiplyScalar(( startOut + range * 1)+ 50 * Math.abs( outNess ));
-    this.v1.add( this.v2 );
-    
-    p1.copy( this.v1 );
+    var DTs = [];
 
-    this.v1.set( 0 , 0 , 0 );
+    // Start Position
+    var d = ( startOut + range * 0 ) ;
+    var t = tanAmount * 40  + sideOffset;
+    d *= totalSize;
+    t *= totalSize;
+    DTs.push([d,t]);
 
-    this.v2.copy( tan );
-    this.v2.multiplyScalar( tanAmount * 40  + outNess * 40 + sideOffset );
-    this.v1.add( this.v2 );
+    // Second Pos
+    var t = ( tanAmount * 40 + sideOffset  );
+    var d = ( startOut + range * .3333 );
+    d *= totalSize;
+    t *= totalSize;
+    DTs.push([d,t]);
 
-    this.v2.copy( dir );
-    this.v2.multiplyScalar( ( startOut + range * .6666));
-    this.v1.add( this.v2 );
-    
-    p2.copy( this.v1 );
+    // third Pos
+    var t = ( tanAmount * 40  + outNess * 60 + sideOffset );
+    var d = ( startOut + range * .66666 );
+    d *= totalSize;
+    t *= totalSize;
+    DTs.push([d,t]);
 
-    this.v1.set( 0 , 0 , 0 );
 
-    this.v2.copy( tan );
-    this.v2.multiplyScalar( tanAmount * 40 + sideOffset  );
-    this.v1.add( this.v2 );
-
-    this.v2.copy( dir );
-    this.v2.multiplyScalar( ( startOut + range * .3333 ));
-    this.v1.add( this.v2 );
-    
-    p3.copy( this.v1 );
+    // connectionPos
+    var t = tanAmount * 40 + outNess * 600 + sideOffset;
+    var d = (( startOut + range * 1)+ 500 * Math.abs( outNess ));
+    d *= totalSize;
+    t *= totalSize;
+    DTs.push([d,t]);*/
 
 
 
-    this.v1.set( 0 , 0 , 0 );
-
-    this.v2.copy( tan );
-    this.v2.multiplyScalar( tanAmount * 40  + sideOffset );
-    this.v1.add( this.v2 );
-
-    this.v2.copy( dir );
-    this.v2.multiplyScalar( ( startOut + range * 0 ) );
-    this.v1.add( this.v2 );
-
-    p4.copy( this.v1 );
+    //endPath = this.createLungPath( DTs , dir , tan )
+    endPath = this.createLungPath( side , HARDCORD[i] , totalSize * 40 , dir , tan )
   
 
-
-    endPositions.push( p1 )
-    endPositions.push( p2 )
-    endPositions.push( p3 )
-    endPositions.push( p4 )
-
     var newDir = new THREE.Vector3();
-    newDir.copy( p4 );
-    newDir.sub( p3 );
+    newDir.copy( endPath[ 0 ] );
+    newDir.sub(  endPath[ 1 ] );
     newDir.normalize();
 
 
 
-		var pathList = this.createBoquet( newDir, endPositions  );
+		var pathList = this.createBoquet( totalSize , newDir, endPath );
 
 		var paths = RecursiveConnector( pathList , totalWires );
 
@@ -167,9 +145,9 @@ City.prototype.createLung = function(){
     basePaths = basePaths.concat( paths.basePaths );
     totalWires + paths.numWires;
 
-    var ySize = 3;
-    var battSize = paths.output.numWires * paths.output.wireSpacing;
-    var geo = new THREE.CubeGeometry(battSize* 1.2, ySize , battSize * 1.2 ) 
+    var ySize = 3 * totalSize;
+    var battSize = paths.output.numWires * paths.output.wireSpacing ; //* totalSize;
+    var geo = new THREE.BoxGeometry( battSize * 1.2, ySize , battSize * 1.2 ) 
     var battery = new THREE.Mesh( geo  , battMat );
 
     battery.position.copy( paths.output.points[ paths.output.points.length-1 ] );
@@ -185,17 +163,17 @@ City.prototype.createLung = function(){
 		//console.log( totalWires )
 	}	
 
-  var battSize = 160;
-  var ySize = 10;
+  var battSize = 300 * totalSize;
+  var ySize = 30 * totalSize ;
   var geo = new THREE.CubeGeometry(battSize* 1.2, ySize , battSize * 1.2 ) 
   var battery = new THREE.Mesh( geo  , battMat );
   battery.position.y += ySize / 2.21;
 
   batteries.push( battery )
 
-  var buildings = this.createBuildingMesh( basePaths , .5 );
+  var buildings = this.createBuildingMesh( basePaths , 2.5 * totalSize , buildingUniforms );
 
-  var wireInfo = new Wire( finishedWires );
+  var wireInfo = new Wire( finishedWires , wireUniforms );
 
   return {
     wire: wireInfo.wire,
@@ -208,12 +186,12 @@ City.prototype.createLung = function(){
 
 }
 
-City.prototype.createBoquet = function( direction , endPositions ){
+City.prototype.createBoquet = function(  totalSize , direction , endPositions ){
 
 	var outputPath  = {
 
 		points:[],
-		wireSpacing: .05,
+		wireSpacing: .1 * totalSize,
 		rightHanded: 1,
 
 	}
@@ -230,42 +208,60 @@ City.prototype.createBoquet = function( direction , endPositions ){
 	for( var i = 0; i < 4; i++ ){
 		
 
-		t = (-i  / 4 ) * 2 * Math.PI  * .5 - 2
+		t = ( (-(i +.5)  / 4 ) + .5 ) * 2 * Math.PI  * .5 
+   // t += (Math.random() - .5 ) * .4
 		var dir = direction.clone();
 		dir.applyAxisAngle( this.upVec , t );
 
 
 
 		flowerEndPos = outputPath.points[0].clone();
-		flowerEndPos.add( this.v1.copy( tan ).multiplyScalar( -10 ))
-		flowerEndPos.add( this.v1.copy( dir ).multiplyScalar( 15  ) );
+    this.v1.copy( direction );
+    this.v1.multiplyScalar( - totalSize )
+    flowerEndPos.add( this.v1 );
 
-		var pathList = this.createMultiFlower( dir , flowerEndPos );
+    var radMultiplier = 1;
+    if( i == 0 ){
+        radMultiplier = 3
+    }else if( i == 1 ){
+      radMultiplier = 5
+    }else if( i == 2 ){
+      radMultiplier = 5
+    }else{
+      radMultiplier = 3
+    }
+
+    //radMultiplier *= 1.5
+
+		flowerEndPos.add( this.v1.copy( tan ).multiplyScalar(  30 * totalSize ));
+		flowerEndPos.add( this.v1.copy( dir ).multiplyScalar( 30  * totalSize * radMultiplier ));
+
+		var pathList = this.createMultiFlower( totalSize , dir , flowerEndPos );
 		//console.log( pathList )
 		inputPaths.push( pathList )
 
 	}	
 
 	return {
-		bufferSize: .5,
+		bufferSize: .1,
 		output: outputPath,
 		inputs: inputPaths,
 	}
 
 }
 
-City.prototype.createMultiFlower = function( direction , endPosition ){
+City.prototype.createMultiFlower = function( totalSize , direction , endPosition ){
 
 	var outputPath = {
 
 		points:[],
-		wireSpacing: .05,
+		wireSpacing: .15 * totalSize,
 		rightHanded: 1
 
 	}
 
 	var basePosition = direction.clone();
-	basePosition.multiplyScalar( 3 );
+	basePosition.multiplyScalar( 3 * totalSize );
 	basePosition.add( endPosition )
 
 
@@ -276,23 +272,24 @@ City.prototype.createMultiFlower = function( direction , endPosition ){
 	
 	for( var i  = 0; i < 2; i++ ){
 
-		var t =(.2-( i / 4 )) * .4 * 2 * Math.PI ;
+		var t =(.2-( i / 4 )) * .8 * 2 * Math.PI ;
 		var dir = direction.clone();
 		dir.applyAxisAngle( this.upVec , t )
 		dir.normalize();
 
 		var pos = new THREE.Vector3();
 		this.v1.copy( dir );
-		this.v1.multiplyScalar( ( i % 2 ) * 10 + 14 );
+		this.v1.multiplyScalar( 54 );
+    this.v1.multiplyScalar( totalSize );
 		pos.add( this.v1 )
 
 		pos.add( basePosition );
 
 		//var pathList = this.createSymmetry();
-		var pathList = this.createFlower( 4 , {
+		var pathList = this.createFlower( totalSize , 4 , {
 			basePosition: pos,
 			direction: dir,
-			wireSpacing: .05
+			wireSpacing: .25 * totalSize
 		});
 
 
@@ -312,7 +309,7 @@ City.prototype.createMultiFlower = function( direction , endPosition ){
 
 }
 
-City.prototype.createFlower = function( petals , params){
+City.prototype.createFlower = function( totalSize , petals , params){
 
 	var petals = petals || 2;
 
@@ -323,11 +320,11 @@ City.prototype.createFlower = function( petals , params){
 		direction: 		new THREE.Vector3( 0 , 0 , 1 ).normalize(),
 
 		rightHanded: 	1,
-		wireSpacing: 	.1, 
-		wireOffset: 	.4,
+		wireSpacing: 	10. * totalSize, 
+		wireOffset: 	.4 * totalSize,
 		output:[
-			[ -4 , 0 ],
-			[ -7 , 0 ]
+			[ -4 * totalSize , 0 ],
+			[ -7 * totalSize , 0 ]
 		]
 
 	});
@@ -360,10 +357,11 @@ City.prototype.createFlower = function( petals , params){
 		var basePos = params.basePosition.clone();
 
 		this.v1.copy( newDir );
-		this.v1.multiplyScalar( 6 ); 
+		this.v1.multiplyScalar( 50 * totalSize ); 
 		basePos.add( this.v1 );
 
-		var input = this.createSymmetry({
+
+		var input = this.createSymmetry( totalSize  , {
 			basePosition: basePos,
 			direction: newDir
 		})
@@ -388,7 +386,8 @@ City.prototype.createSymmetryRow = function( params ){
 
 
 
-City.prototype.createSymmetry = function( params ){
+City.prototype.createSymmetry = function( totalSize , params ){
+
 
 	var params = _.defaults( params || {} , {
 
@@ -396,22 +395,24 @@ City.prototype.createSymmetry = function( params ){
 		//endPosition: 	new THREE.Vector3(-1 , 0 , 0 ),
 		direction: 		new THREE.Vector3( 1 , 0 , 1 ).normalize(),
 		rightHanded: 	1,
-		wireSpacing: 	.1, 
-		wireOffset: 	.4,
+		wireSpacing: 	.25 * totalSize, 
+		wireOffset: 	2 * totalSize,
 
 		input: [
-			[ 0   , 0 ],
-			[ .8  , 0 ],
-			[ 1.6 , 0 ],
-			[ 2.4 , 0 ],
-			[ 3.2 , 0 ],
-			[ 4.0 , 0 ],
+			[ 0   * totalSize * 5 , 0 ],
+			[ .8  * totalSize * 5 , 0 ],
+			[ 1.6 * totalSize * 5 , 0 ],
+			[ 2.4 * totalSize * 5 , 0 ],
+			[ 3.2 * totalSize * 5 , 0 ],
+			[ 4.0 * totalSize * 5 , 0 ],
+      [ 4.8 * totalSize * 5 , 0 ],
+      [ 5.6 * totalSize * 5 , 0 ],
 		],
 
 		// needs to be at least length 2
 		output: [
-			[ -1 ,  -.1 * 3 - .3 ],
-			[ -3 ,  -.1 * 3 - .3 ],
+			[ -1 * totalSize ,  (-.1 * 3 - .3 ) * totalSize ],
+			[ -3 * totalSize ,  (-.1 * 3 - .3 ) * totalSize ],
 		]
 
 	})
@@ -431,7 +432,7 @@ City.prototype.createSymmetry = function( params ){
 	);
 
 	var basePosition = params.basePosition.clone();
-	this.v1.copy( tan ).multiplyScalar( -1 );
+	this.v1.copy( tan ).multiplyScalar( -5 * totalSize );
 	basePosition.add( this.v1 )
 	var buildings1 = this.createPathsFromInput( 
 		params.input, 
@@ -444,7 +445,7 @@ City.prototype.createSymmetry = function( params ){
 	);
 
 	var basePosition = params.basePosition.clone();
-	this.v1.copy( tan ).multiplyScalar( 1 );
+	this.v1.copy( tan ).multiplyScalar(5 * totalSize );
 	basePosition.add( this.v1 )
 	var buildings2 = this.createPathsFromInput( 
 		params.input, 
@@ -467,64 +468,6 @@ City.prototype.createSymmetry = function( params ){
 	}
 
 }
-
-City.prototype.createRow = function( params ){
-
-	var params = _.defaults( params || {} , {
-
-		basePosition: new THREE.Vector3(),
-		//endPosition: 	new THREE.Vector3(-1 , 0 , 0 ),
-		direction: 		new THREE.Vector3( 1 , 0 , 0 ),
-		rightHanded: 	1,
-		wireSpacing: 	.2, 
-		wireOffset: 	.4,
-
-		input: [
-			[ 0   , 0 ],
-			[ .8  , 0 ],
-			[ 1.6 , 0 ],
-		],
-
-		// needs to be at least length 2
-		output: [
-			[ -1 ,  .4 ],
-			[ -2 ,  .4 ],
-		]
-
-	})
-
-	var v1  = new THREE.Vector3();
-	var tan = this.getTan( params.direction , params.rightHanded );
-
-	var outputPath = this.createOutputPath(
-
-		params.output , 
-		params.basePosition , 
-		params.direction,
-		tan,
-		params.wireSpacing,
-		params.rightHanded
-
-	);
-
-	var inputPaths = this.createPathsFromInput( 
-		params.input, 
-		params.direction,
-		tan,
-		params.wireSpacing,
-		params.wireOffset,
-		params.basePosition,
-		params.rightHanded
-	);
-
-	return {
-		bufferSize: .6,
-		output: outputPath,
-		inputs: inputPaths,
-	}
-
-}
-
 
 // This part is good!
 City.prototype.createBuildingMesh = function( basePaths , bs ){
@@ -695,6 +638,60 @@ City.prototype.reverseArray = function( array ){
 
 }
 
+
+City.prototype.createLungPath = function( side , DTs, size , dir , tan ){
+
+  var path = [];
+  for( var  i  =0; i < DTs.length; i++ ){
+    path.push( new THREE.Vector3() );
+  }
+
+  var offset = .5 * size;
+  var ofs = .6
+  if( side == 0 || side == 2 ){
+    offset = ofs * size;
+  }else{
+    offset = -ofs * size;
+  }
+
+  for( var  i = 0; i < DTs.length; i++ ){
+
+    var v = path[ ( path.length - 1 ) - i ];
+   // console.log( v );
+    this.assignUsingDirTan( v , side ,  offset , DTs[i] , size  , dir , tan );
+
+
+  }
+
+  return path;
+
+}
+
+City.prototype.assignUsingDirTan = function( v , side , offset , dt , size  , dir , tan){
+
+  this.v1.set( 0 , 0 , 0 );
+
+  var dSize = dt[0] * size;
+  if( side == 2 ){
+    dSize += offset;
+  }
+  this.v2.copy( dir );
+  this.v2.multiplyScalar( dSize );
+  this.v1.add( this.v2 );
+
+
+  var tSize = dt[1] * size;
+  if( side !== 2 ){
+    tSize += offset;
+  }
+
+  this.v2.copy( tan );
+  this.v2.multiplyScalar( tSize );
+  this.v1.add( this.v2 );
+  
+  v.copy( this.v1 );
+
+}
 
 
 

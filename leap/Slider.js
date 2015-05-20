@@ -2,6 +2,9 @@ function Slider( size , touchers , body , bufferDistance ){
 
   this.body = body;
 
+  this.linkedUniforms = [];
+  this.value = 0;
+
   var x = 1/5;
   var y = 1;
   x *= size;
@@ -12,7 +15,6 @@ function Slider( size , touchers , body , bufferDistance ){
   scale.multiplyScalar( 1 / y );
   console.log( scale );
 
-  var touchers = touchPlane.touchers;
   this.uniforms =  {
 
     touchers        : { type : "v3v" , value : touchers       },
@@ -70,10 +72,33 @@ function Slider( size , touchers , body , bufferDistance ){
 
 }
 
+
+
 Slider.prototype.update = function(){
 
 	this.touchPlane.update();
 
+  for( var i = 0; i < this.linkedUniforms.length; i++ ){
+    var u = this.linkedUniforms[i];
+    var cons = u.constraints;
+    u.value = cons[0] + ( cons[1] - cons[0] ) * this.value;
+  }
+
+  this.uniforms.filled.value = this.value
+
+}
+
+Slider.prototype.linkUniform = function( u ){ 
+  this.linkedUniforms.push( u );
+  this.value = ( u.value - u.constraints[ 0 ] ) / ( u.constraints[1] - u.constraints[0] );
+}
+
+Slider.prototype.unlinkUniform = function( u ){ 
+  for( var i = 0; i < this.linkedUniforms.length; i++ ){
+    if( u === this.linkedUniforms[i] ){
+      this.linkedUniforms.splice( i , 0 );
+    }
+  }
 }
 
 Slider.prototype._touchDown = function( e ){
@@ -97,7 +122,7 @@ Slider.prototype._hoverUp = function( e ){
 
 Slider.prototype.touching = function(e){
 
-  this.uniforms.filled.value = ( e.XY[1] * 2 + this.touchPlane.y ) / ( 2. * this.touchPlane.y) ;
+  this.value  = ( e.XY[1] * 2 + this.touchPlane.y ) / ( 2. * this.touchPlane.y) ;
 
 }
 

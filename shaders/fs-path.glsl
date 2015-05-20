@@ -1,3 +1,7 @@
+
+uniform float slider1;
+uniform float slider2;
+uniform float slider3;
 varying float vID;
 
 vec3 hsv(float h, float s, float v)
@@ -11,7 +15,7 @@ vec3 hsv(float h, float s, float v)
 void main(){
 	
 
-	vec3 col = hsv( abs(cos(vID*.1)) , 1. ,1.);
+	vec3 col = hsv( abs(cos(vID*.1 * slider1)) , slider2 , slider3 );
 
 
 	gl_FragColor = vec4( col , 1. );

@@ -28,7 +28,7 @@ void main(){
 		abs( xy.x ) > 1. - ( .02 /  scale.x  ) || 
 		abs( xy.y ) > 1. - ( .02 /  scale.y  )
 	){ 
-		col = vec4( baseCol ,1. ); 
+		//col = vec4( baseCol ,1. ); 
 	}
 
 	//if( x > bandSize || y > bandSize ){ col = vec4( baseCol ,1. ); }

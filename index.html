@@ -22,12 +22,13 @@
     <!-- MINE LIB -->
     <script src = "lib/ShaderLoader.js"                     ></script>
     <script src = "lib/TextCreator.js"                      ></script>
+    <script src = "lib/PhysicsRenderer.js"                  ></script>
 
 
     <!-- AUDIO -->     
-    <script src = "AudioController.js"                      ></script>
-    <script src = "UserAudio.js"                            ></script>
-    <script src = "Stream.js"                               ></script>
+    <script src = "audio/AudioController.js"                ></script>
+    <script src = "audio/UserAudio.js"                      ></script>
+    <script src = "audio/AudioTexture.js"                   ></script>
   
         
     <!-- PATHS -->
@@ -37,6 +38,8 @@
     <script src = "path/RecursiveConnector.js"              ></script>  
     <script src = "path/City.js"                            ></script>
     <script src = "path/TestPath.js"                        ></script>
+    <script src = "path/HARDCORD.js"                        ></script>
+
 
 
     <!-- PANNING CONTROLS -->
@@ -46,6 +49,18 @@
     <script src = "leap/PanPlane.js"                        ></script>
     <script src = "leap/Button.js"                          ></script>
     <script src = "leap/Slider.js"                          ></script>
+    <script src = "leap/ToggleButton.js"                    ></script>
+
+
+    <!-- PUPPY -->
+    <script src = "puppy/RepelerMesh.js"                    ></script>
+    <script src = "puppy/GEM.js"                            ></script>
+    <script src = "puppy/Crucible.js"                       ></script>
+    <script src = "puppy/SpacePuppy.js"                     ></script>
+
+
+    <!-- PULSE -->
+    <script src = "Pulse.js"                                ></script>
 
     <script>
 
@@ -88,6 +103,12 @@
       shaders.load( 'vs-slider' , 'slider' , 'vertex' );
       shaders.load( 'fs-slider' , 'slider' , 'fragment' );
 
+      // PUPPY
+      shaders.load( 'ss-puppy' , 'puppy' , 'simulation' );
+
+      shaders.load( 'vs-puppy' , 'puppy' , 'vertex' );
+      shaders.load( 'fs-puppy' , 'puppy' , 'fragment' );
+
 
 
       /*
@@ -97,11 +118,6 @@
       */
       //var audio = new AudioController();
 
-      //var userAudio = new UserAudio( audio.ctx , audio.gain );
-
-
-      // Muting audio, so we don't have feedback
-      //audio.mute.gain.value = 0;
 
 
 
@@ -113,12 +129,37 @@
         dT:      { type: "f"  , value : 0             },
         time:    { type: "f"  , value : 0             },
         fingers: { type: "v3" , value : []            },
+        slider1: { type: "f"  , value : .5 , constraints: [ 0 , 1 ] },
+        slider2: { type: "f"  , value : .9 , constraints: [ 0 , 1 ] },
+        slider3: { type: "f"  , value : 1 , constraints: [ 0 , 1 ] },
 
       }
 
       var G = {};
 
       G.uniforms = uniforms;
+      G.sliders = [];
+      G.v1 = new THREE.Vector3();
+      G.v2 = new THREE.Vector3();
+
+      // Textures
+      G.t = {}
+
+      G.t.matcap = THREE.ImageUtils.loadTexture('img/blood.jpg');
+      //G.t.normal = THREE.ImageUtils.loadTexture('img/t_n_snakeSkin.png');
+      G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
+
+      G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
+
+
+      G.audio = new AudioController();
+
+      var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
+
+
+      //Muting audio, so we don't have feedback
+      G.audio.mute.gain.value = 0;
+
 
 
 
@@ -156,36 +197,12 @@
 
         controls = new THREE.TrackballControls( camera );
 
-
-
-        G.city = new City();
-      
-
-        var cityBody = new THREE.Object3D();
-
-        cityBody.add( G.city.buildings );
-        cityBody.add( G.city.wire );
-        cityBody.scale.multiplyScalar( .1 );
-
-        for( var i = 0; i < G.city.batteries.length; i++ ){
-          cityBody.add( G.city.batteries[i] );
-        }
-        
-
-        scene.add( cityBody );
-
-        G.city.body = cityBody;
-
-        //scene.add( city.debug );
-        G.city.debug.position.y = -.1;
-
-
-
         G.fingers = new LeapFingers();
 
         G.fingers.addToScene( scene );
         leap.connect();
 
+        pulse = new Pulse();
 
         var position = new THREE.Vector3(0, 0 , 0);
         var normal = new THREE.Vector3( 0 , 1 , 0 );
@@ -208,22 +225,20 @@
 
         touchPlaneBody = new TouchPlaneBody( G.touchPlane );
 
+        G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
-        G.city.body.position.z = -4;
-        G.city.body.rotation.x = Math.PI / 2;
-
-        G.panPlane = new PanPlane( G.city.body , G.touchPlane , true );
-
-        G.panPlane.forceMultiplier = 5;
+        G.panPlane.forceMultiplier = 1;
         G.panPlane.maxX = 1000;
         G.panPlane.maxY = 1000;
 
-        /*var xWidth = .1;
-        var paths = RecursiveConnector( TestPath() , xWidth , 0 );
-        var wireInfo = new Wire( paths ,  xWidth );
 
-        scene.add( wireInfo.wire );*/
-        //initDemoPath();
+        pulse.body.position.y = -8
+
+        pulse.addCity();
+        pulse.addPuppy();
+
+     
+
 
       }
 
@@ -242,7 +257,9 @@
         G.panPlane.update();
 
         controls.update();
-        //audio.update();
+        G.audio.update();
+        
+        pulse.update();
         
         renderer.render( scene , camera );
 
