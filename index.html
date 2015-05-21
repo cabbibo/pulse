@@ -17,6 +17,9 @@
     <script src = "lib/underscore.js"                       ></script>
     <script src = "lib/leap.min.js"                         ></script>
     <script src = "lib/TrackballControls.js"                ></script>
+
+    <script src = "lib/VREffect.js"                         ></script>
+    <script src = "lib/VRControls.js"                       ></script>
         
 
     <!-- MINE LIB -->
@@ -71,6 +74,10 @@
 
 
       var camera, renderer, scene , controls , clock;
+
+      var VR = true
+      var effect;
+      
       
       var audioMesh;
 
@@ -191,6 +198,11 @@
 
         document.body.appendChild( renderer.domElement );
 
+
+
+
+
+
         window.addEventListener( 'resize', onWindowResize, false );
 
         clock = new THREE.Clock();
@@ -261,7 +273,13 @@
         
         pulse.update();
         
-        renderer.render( scene , camera );
+
+        if( VR == true ){
+          effect.render( scene, camera );
+        }else{
+          renderer.render( scene , camera );
+        }
+
 
       }
 
