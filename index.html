@@ -17,6 +17,7 @@
     <script src = "lib/underscore.js"                       ></script>
     <script src = "lib/leap.min.js"                         ></script>
     <script src = "lib/TrackballControls.js"                ></script>
+    <script src = "lib/simplex-noise.js"                    ></script>
         
 
     <!-- MINE LIB -->
@@ -57,10 +58,19 @@
     <script src = "puppy/GEM.js"                            ></script>
     <script src = "puppy/Crucible.js"                       ></script>
     <script src = "puppy/SpacePuppy.js"                     ></script>
-
+    
+    <!-- SCENE -->
+    <script src = "scene/Cliff.js"                          ></script>
+    <script src = "scene/Mountains.js"                      ></script>
 
     <!-- PULSE -->
     <script src = "Pulse.js"                                ></script>
+
+
+
+    <!--npm modules -->
+
+
 
     <script>
 
@@ -108,6 +118,16 @@
 
       shaders.load( 'vs-puppy' , 'puppy' , 'vertex' );
       shaders.load( 'fs-puppy' , 'puppy' , 'fragment' );
+      
+      // Puppy Interface
+      shaders.load( 'fs-lifeDisks' , 'lifeDisks' , 'fragment' );
+      shaders.load( 'vs-lifeDisks' , 'lifeDisks' , 'vertex' );
+      
+      shaders.load( 'fs-lifeBases' , 'lifeBases' , 'fragment' );
+      shaders.load( 'vs-lifeBases' , 'lifeBases' , 'vertex' );
+
+      shaders.load( 'fs-crucible' , 'crucible' , 'fragment' );
+      shaders.load( 'vs-crucible' , 'crucible' , 'vertex' );
 
 
 
@@ -125,13 +145,26 @@
       // Normals For the Material
       var uniforms = {
   
-        //;t_audio: { type:"t"  , value : audio.texture },
+        t_audio: { type:"t"  , value : null },
         dT:      { type: "f"  , value : 0             },
         time:    { type: "f"  , value : 0             },
         fingers: { type: "v3" , value : []            },
+
+        // MOON
+        lightPos: {type:"v3" , value: new THREE.Vector3() },
+        
+
+        // For the interface
         slider1: { type: "f"  , value : .5 , constraints: [ 0 , 1 ] },
         slider2: { type: "f"  , value : .9 , constraints: [ 0 , 1 ] },
         slider3: { type: "f"  , value : 1 , constraints: [ 0 , 1 ] },
+
+        toggle1 : { type: "f" , value: 0 },
+        toggle2 : { type: "f" , value: 0 },
+        toggle3 : { type: "f" , value: 0 },
+        toggle4 : { type: "f" , value: 0 },
+        toggle5 : { type: "f" , value: 0 },
+        toggle6 : { type: "f" , value: 0 },
 
       }
 
@@ -141,6 +174,9 @@
       G.sliders = [];
       G.v1 = new THREE.Vector3();
       G.v2 = new THREE.Vector3();
+
+
+
 
       // Textures
       G.t = {}
@@ -153,6 +189,8 @@
 
 
       G.audio = new AudioController();
+      G.uniforms.t_audio.value = G.audio.texture;
+
 
       var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
 
@@ -197,6 +235,12 @@
 
         controls = new THREE.TrackballControls( camera );
 
+        G.light = new THREE.PointLight( 0xfffffff , 1 , 100 );
+        scene.add( G.light );
+
+        G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .3 , 1 ) , new THREE.MeshBasicMaterial() );
+        scene.add( G.lightMarker );
+
         G.fingers = new LeapFingers();
 
         G.fingers.addToScene( scene );
@@ -228,11 +272,11 @@
         G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
         G.panPlane.forceMultiplier = 1;
-        G.panPlane.maxX = 1000;
-        G.panPlane.maxY = 1000;
+        G.panPlane.maxX = 80;
+        G.panPlane.maxY = 80;
 
 
-        pulse.body.position.y = -8
+        pulse.body.position.y = -30
 
         pulse.addCity();
         pulse.addPuppy();
@@ -245,7 +289,6 @@
       
       function animate(){
 
-        requestAnimationFrame( animate );
        
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;
@@ -262,6 +305,9 @@
         pulse.update();
         
         renderer.render( scene , camera );
+
+                requestAnimationFrame( animate );
+
 
       }
 

@@ -5,6 +5,8 @@ function ToggleButton( size , touchers , body , bufferDistance ){
   this.hovering = false;
 
   this.body = body;
+  this.linkedUniforms = [];
+  
   this.toggled = false;
 
 
@@ -61,6 +63,33 @@ function ToggleButton( size , touchers , body , bufferDistance ){
 ToggleButton.prototype.update = function(){
 
   this.touchPlane.update();
+
+  for( var i = 0; i < this.linkedUniforms.length; i++ ){
+    var u = this.linkedUniforms[i];
+    u.value = ( this.toggled == false ) ? 0 : 1
+  }
+
+
+}
+
+// TODO: Make sure we inherit from this uniform
+// our toggled value
+ToggleButton.prototype.linkUniform = function( uniform ){
+
+  this.linkedUniforms.push( uniform )
+
+}
+
+
+ToggleButton.prototype.unlinkUniform = function( u ){
+
+  for( var i = 0; i < this.linkedUniforms.length; i++ ){
+    if( u === this.linkedUniforms[i] ){
+      this.linkedUniforms.splice( i , 0 );
+    }
+  }
+
+
 
 }
 

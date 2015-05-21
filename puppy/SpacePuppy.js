@@ -36,24 +36,22 @@ function SpacePuppy( size ,  fingers , zPos ){
 
 
 
-  // CRUCIBLE
-
   this.height = .1;
   this.radius = .4;
   this.innerRadius = .3;
   this.downInnerRadius = .2;
 
-  var geo = new THREE.CylinderGeometry(this.innerRadius , this.radius , this.height , 50 , 1 , true );
-  var mat = new THREE.MeshNormalMaterial()
-  var mesh = new THREE.Mesh( geo , mat );
-  mesh.position.y = -this.puppyY + this.height / 2;
-  this.body.add(  mesh );
+  this.crucible = this.createCrucible( 
+    this.height,
+    this.radius,
+    this.innerRadius,
+    this.downInnerRadius
+  );
 
-  var geo = new THREE.CylinderGeometry( this.innerRadius , this.downInnerRadius , this.height  , 50 , 1 , true );
-  var mat = new THREE.MeshNormalMaterial({ side: THREE.BackSide })
-  var mesh = new THREE.Mesh( geo , mat );
-  mesh.position.y = -this.puppyY + this.height / 2;
-  this.body.add( mesh );
+  this.crucible.position.y = - this.puppyY; //+ this.height/2;
+  this.body.add( this.crucible )
+
+
 
 
 
@@ -234,6 +232,196 @@ SpacePuppy.prototype.update = function(){
 
 }
 
+
+SpacePuppy.prototype.createCrucible = function( h , r , iR , iiR){
+
+  var sides = 40;
+
+  var totalVerts = sides * 3 * 2 * 2;
+
+  var positions = new Float32Array( totalVerts * 3 );
+  var uvs       = new Float32Array( totalVerts * 2 );
+  var normals   = new Float32Array( totalVerts * 3 );
+  
+  var n = new THREE.Vector3();
+  var n1 = new THREE.Vector3();
+  var n2 = new THREE.Vector3();
+
+  var p1 = new THREE.Vector3();
+  var p2 = new THREE.Vector3();
+  var p3 = new THREE.Vector3();
+  var p4 = new THREE.Vector3();
+
+
+
+  function getXYZ( id , whichRing ){
+
+    var z = 0;
+    if( whichRing == 1 ){
+      z = h;
+    }
+
+    var rad = r;
+
+    if( whichRing == 1 ){ rad = iR }
+    if( whichRing == 2 ){ rad = iiR }
+
+    var t = ( id / sides ) * 2 * Math.PI;
+
+    var x = rad * Math.cos( t );
+    var y = rad * Math.sin( t );
+
+    return [ x , z , y ];
+
+
+  }
+
+  for( var i = 0; i< sides; i++ ){
+
+    for( var j = 0; j < 2; j++ ){
+
+      var index = ( i * 2 + j) * 3 * 2; 
+
+      var xyz = getXYZ( i , j );
+      p1.set( xyz[0] , xyz[1] , xyz[2] )
+
+      var xyz = getXYZ( i+1 , j );
+      p2.set( xyz[0] , xyz[1] , xyz[2] )
+
+      var xyz = getXYZ( i , j+1 );
+      p3.set( xyz[0] , xyz[1] , xyz[2] )
+
+      var xyz = getXYZ( i+1 , j+1 );
+      p4.set( xyz[0] , xyz[1] , xyz[2] )
+
+      // Cliff Side
+      positions[ index * 3 + 0  ] = p1.x;
+      positions[ index * 3 + 1  ] = p1.y;
+      positions[ index * 3 + 2  ] = p1.z;
+
+      positions[ index * 3 + 3  ] = p2.x;
+      positions[ index * 3 + 4  ] = p2.y;
+      positions[ index * 3 + 5  ] = p2.z;
+
+      positions[ index * 3 + 6  ] = p3.x;
+      positions[ index * 3 + 7  ] = p3.y;
+      positions[ index * 3 + 8  ] = p3.z;
+
+
+      positions[ index * 3 + 9  ] = p4.x;
+      positions[ index * 3 + 10 ] = p4.y;
+      positions[ index * 3 + 11 ] = p4.z;
+
+      positions[ index * 3 + 12 ] = p3.x;
+      positions[ index * 3 + 13 ] = p3.y;
+      positions[ index * 3 + 14 ] = p3.z;
+
+      positions[ index * 3 + 15 ] = p2.x;
+      positions[ index * 3 + 16 ] = p2.y;
+      positions[ index * 3 + 17 ] = p2.z;
+
+      n1.copy( p1 );
+      n1.sub( p2 );
+
+      n2.copy( p1 );
+      n2.sub( p3 );
+
+      n2.normalize();
+      n1.normalize();
+
+      n.crossVectors( n1 , n2 );
+
+      n.normalize().multiplyScalar( 1 );
+
+          // Cliff Side
+      normals[ index * 3 + 0  ]  = n.x;
+      normals[ index * 3 + 1  ] = n.y;
+      normals[ index * 3 + 2  ] = n.z;
+
+      normals[ index * 3 + 3  ] = n.x;
+      normals[ index * 3 + 4  ] = n.y;
+      normals[ index * 3 + 5  ] = n.z;
+
+      normals[ index * 3 + 6  ] = n.x;
+      normals[ index * 3 + 7  ] = n.y;
+      normals[ index * 3 + 8  ] = n.z;
+
+
+      n1.copy( p4 );
+      n1.sub( p2 );
+
+      n2.copy( p4 );
+      n2.sub( p3 );
+
+      n2.normalize();
+      n1.normalize();
+
+      n.crossVectors( n1 , n2 );
+
+      n.normalize().multiplyScalar( -1 );
+
+
+      normals[ index * 3 + 9 ] = n.x;
+      normals[ index * 3 + 10 ] = n.y;
+      normals[ index * 3 + 11 ] = n.z;
+
+      normals[ index * 3 + 12 ] = n.x;
+      normals[ index * 3 + 13 ] = n.y;
+      normals[ index * 3 + 14 ] = n.z;
+
+      normals[ index * 3 + 15 ] = n.x;
+      normals[ index * 3 + 16 ] = n.y;
+      normals[ index * 3 + 17 ] = n.z;
+
+      uvs[ index * 2 + 0  ] = i/sides;
+      uvs[ index * 2 + 1  ] = j/2;
+
+      uvs[ index * 2 + 2  ] = (i+1)/sides;
+      uvs[ index * 2 + 3  ] = j/2;
+
+      uvs[ index * 2 + 4  ] = i/sides;
+      uvs[ index * 2 + 5  ] = (j+1)/2;
+
+      uvs[ index * 2 + 6  ] = (i+1)/sides;
+      uvs[ index * 2 + 7  ] = (j+1)/2;
+
+      uvs[ index * 2 + 8  ] = i/sides;
+      uvs[ index * 2 + 9  ] = (j+1)/2;
+
+      uvs[ index * 2 + 10 ] = (i+1)/sides;
+      uvs[ index * 2 + 11 ] = j/2;
+
+    }
+
+
+  }
+
+  var geo = new THREE.BufferGeometry();
+
+  var pos = new THREE.BufferAttribute( positions , 3 );
+  var uv  = new THREE.BufferAttribute( uvs , 2 );
+  var normal  = new THREE.BufferAttribute( normals , 3 );
+
+  geo.addAttribute( 'position' , pos );
+  geo.addAttribute( 'uv' , uv );
+  geo.addAttribute( 'normal' , normal );
+
+  var crucible = new THREE.Mesh( geo , new THREE.ShaderMaterial({
+    uniforms:{
+      lightPos: G.uniforms.lightPos,
+      t_audio: G.uniforms.t_audio,
+    },
+    vertexShader: shaders.vs.crucible,
+    fragmentShader: shaders.fs.crucible,
+    side: THREE.BackSide
+  }));
+
+  return crucible;
+
+
+}
+
+
 SpacePuppy.prototype.createLifeDisks = function( repelers ){
 
 
@@ -259,6 +447,7 @@ SpacePuppy.prototype.createLifeDisks = function( repelers ){
 
 
   for( var i  = 0; i < repelers.length; i++ ){
+
 
     p.x = repelers[i].x;
     p.y = repelers[i].y;
@@ -365,7 +554,21 @@ SpacePuppy.prototype.createLifeDisks = function( repelers ){
   geo.addAttribute( 'normal' , normal );
 
 
-  var mat = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide })
+
+  var vs = shaders.vs.lifeDisks;
+  var fs = shaders.setValue( shaders.fs.lifeDisks , 'NUMDISKS' , repelers.length )
+
+  console.log( fs )
+  var mat = new THREE.ShaderMaterial({
+    uniforms:{
+      t_audio: G.uniforms.t_audio
+    },
+    vertexShader: vs,
+    fragmentShader: fs,
+    side: THREE.DoubleSide,
+    transparent: true
+  })
+
   var lifeDisks = new THREE.Mesh( geo , mat )
 
   return lifeDisks;
@@ -655,7 +858,20 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
   geo.addAttribute( 'normal' , normal );
 
 
-  var mat = new THREE.MeshNormalMaterial({ side: THREE.BackSide });
+  var vs = shaders.vs.lifeBases;
+  var fs = shaders.setValue( shaders.fs.lifeBases , 'NUMDISKS' , bases.length )
+
+  console.log( fs )
+  var mat = new THREE.ShaderMaterial({
+    uniforms:{
+      t_audio: G.uniforms.t_audio
+    },
+    vertexShader: vs,
+    fragmentShader: fs,
+    side: THREE.BackSide,
+    //transparent: true,
+  })
+  //var mat = new THREE.MeshNormalMaterial({ side: THREE.BackSide });
   var lifeBases = new THREE.Mesh( geo , mat )
 
   return lifeBases;
@@ -682,6 +898,10 @@ SpacePuppy.prototype.createInterface = function(){
     body.position.x =  .06  * ( i % 3) ;
 
     var button = new ToggleButton( .05 , indexFingers , body , .01 );
+
+    var string = 'toggle' + ( i + 1 )
+    var u = G.uniforms[ string ];
+    button.linkUniform( u );
 
     interface.add( button.body );
     interface.buttons.push( button);

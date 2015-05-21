@@ -5,6 +5,7 @@ function Button( string , size , touchers , body , bufferDistance ){
   this.hovering = false;
 
   this.body = body;
+  this.linkedUniforms = [];
 
 	this.title = textCreator.createMesh( string );
   this.title.scale.multiplyScalar( .001 );
@@ -56,6 +57,8 @@ function Button( string , size , touchers , body , bufferDistance ){
 
 
 }
+
+
 
 Button.prototype.update = function(){
 
