@@ -672,7 +672,7 @@ SpacePuppy.prototype.createInterface = function(){
 
   var indexFingers = [
     this.fingers[1],
-    this.fingers[5]
+    this.fingers[6]
   ];
 
   for( var  i = 0; i < 6; i++ ){
