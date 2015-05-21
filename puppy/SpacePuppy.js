@@ -91,9 +91,12 @@ function SpacePuppy( size ,  fingers , zPos ){
 
     var v = new THREE.Vector4();
 
-    G.v1.x = Math.random() - .5;
-    G.v1.y = Math.random() * .5 - .1;
-    G.v1.z = Math.random() - .5;
+    var t = i / 50;
+    t *= 2 * Math.PI;
+
+    G.v1.x = Math.cos( t );
+    G.v1.y = Math.random() * 2. - .8;
+    G.v1.z = Math.sin( t );
     G.v1.normalize();
 
     G.v1.multiplyScalar( size  * 1.1);

@@ -46,11 +46,16 @@ function Pulse(){
   this.body.add( this.water );
 
 
+  this.moonField = new MoonField( this.puppyPos );
+  this.body.add( this.moonField.body );
+
+
 }
 
 Pulse.prototype.update = function(){
 
   this.moon.update();
+  this.moonField.update();
 
   G.uniforms.lightPos.value.copy( this.moon.globalPos );
   G.light.position.copy( this.moon.globalPos );

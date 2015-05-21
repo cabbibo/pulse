@@ -1,6 +1,8 @@
 
 uniform sampler2D t_pos;
 uniform sampler2D t_oPos;
+uniform sampler2D t_audio;
+uniform float puppyPos;
 
 uniform vec2 resolution;
 
@@ -23,25 +25,37 @@ void main(){
   float life  = pos.w;
 
 
+  vec4 a = texture2D( t_audio , vec2( uv.x , 0. ) );
+
   vec3 f = vec3( 0. );
 
-  f += normalize( pos.xyz ) * .0001 / length( pos.xyz);/// vec3( .01 , 0. , 0. );
-  f += curlNoise( pos.xyz * .3 ) * .001;
 
 
-  if( life > 5. ){
-    life = 5.;
+  f +=  vec3( .0 , 0.003  * (  life - .5 )  * life, -0.01 * ( 1. - life ) );
+  f += curlNoise( pos.xyz * .4 ) * .003 * ( 1. - life );
+
+
+  if( life > 1. ){
+    life = 1.;
     vel = vec3( 0. );
+    f = vec3( 0. , .01 , 0. );
   }
 
-  life -= .003 + rand( uv ) * .01;
+  life -= .0003 + (1. + length( a ) * .1 ) * rand( uv ) * .001;
 
   if( life < 0. ){
-    life = 5.3;
+    life = 1.1;
     vel = vec3( 0. );
-    p = vec3( rand( uv ), rand( uv * 3.515), rand( uv * 993.51 ) );
-    p = normalize( p ) - .5;
-    p = normalize( p ) * 2.;
+    p = vec3( uv.x -.5 , 0. , uv.y-.5 ) * .3;
+
+    p = vec3( 0. , 0. , -30. );
+
+    float t = ( uv.x * .5 + .5) * 3.14195 * 2. ;
+
+    p.x += cos( t ) * (uv.y *.4+1.);
+    p.z += sin( t ) * (uv.y *.4+1.);
+   // p = vec3( (uv.x -.5) * 10. * ( uv.y + .1 ) , 0. , -(uv.y + 1.) * 10. );
+
   }
 
 
@@ -49,7 +63,7 @@ void main(){
 
   vel += f;
   vel *= .9;
-  p += vel;
+  p += vel * ( .6 + length( a ) * length( a ) * .2 );
 
 
 

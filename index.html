@@ -68,6 +68,7 @@
     <!-- SCENE -->
     <script src = "scene/Cliff.js"                          ></script>
     <script src = "scene/Moon.js"                           ></script>
+    <script src = "scene/MoonField.js"                      ></script>
     <script src = "scene/Mountains.js"                      ></script>
 
     <!-- PULSE -->
@@ -249,7 +250,7 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 1000 );
+        camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 100 );
         camera.position.z = .2;
         camera.position.y = 0.1;
         camera.lookAt( new THREE.Vector3() );
@@ -348,7 +349,7 @@
 
 
 
-        pulse.body.position.y = -15
+        pulse.body.position.y = -30
 
         pulse.addCity();
         pulse.addPuppy();
