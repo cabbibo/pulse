@@ -27,6 +27,8 @@
     <script src = "lib/ShaderLoader.js"                     ></script>
     <script src = "lib/TextCreator.js"                      ></script>
     <script src = "lib/PhysicsRenderer.js"                  ></script>
+    <script src = "lib/PhysicsArrayRenderer.js"             ></script>
+    <script src = "lib/CreateGeometries.js"                 ></script>
 
 
     <!-- AUDIO -->     
@@ -65,6 +67,7 @@
     
     <!-- SCENE -->
     <script src = "scene/Cliff.js"                          ></script>
+    <script src = "scene/Moon.js"                           ></script>
     <script src = "scene/Mountains.js"                      ></script>
 
     <!-- PULSE -->
@@ -135,6 +138,7 @@
       shaders.load( 'vs-puppy' , 'puppy' , 'vertex' );
       shaders.load( 'fs-puppy' , 'puppy' , 'fragment' );
       
+
       // Puppy Interface
       shaders.load( 'fs-lifeDisks' , 'lifeDisks' , 'fragment' );
       shaders.load( 'vs-lifeDisks' , 'lifeDisks' , 'vertex' );
@@ -144,6 +148,16 @@
 
       shaders.load( 'fs-crucible' , 'crucible' , 'fragment' );
       shaders.load( 'vs-crucible' , 'crucible' , 'vertex' );
+
+
+      // Scene 
+      shaders.load( 'ss-moonBeams' , 'moonBeams' , 'simulation' );
+
+      shaders.load( 'vs-moonBeams' , 'moonBeams' , 'vertex'     );
+      shaders.load( 'fs-moonBeams' , 'moonBeams' , 'fragment'   );
+
+      shaders.load( 'vs-moonBeamLines' , 'moonBeamLines' , 'vertex'     );
+      shaders.load( 'fs-moonBeamLines' , 'moonBeamLines' , 'fragment'   );
 
 
 
@@ -202,6 +216,11 @@
       G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
 
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
+
+      G.t.sprite = THREE.ImageUtils.loadTexture('img/flare.png');
+
+
+
 
 
       G.audio = new AudioController();
@@ -273,7 +292,7 @@
         G.light = new THREE.PointLight( 0xfffffff , 1 , 100 );
         scene.add( G.light );
 
-        G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .3 , 1 ) , new THREE.MeshBasicMaterial() );
+        G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .03 , 1 ) , new THREE.MeshBasicMaterial() );
         scene.add( G.lightMarker );
 
 
@@ -329,7 +348,7 @@
 
 
 
-        pulse.body.position.y = -30
+        pulse.body.position.y = -15
 
         pulse.addCity();
         pulse.addPuppy();

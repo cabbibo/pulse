@@ -33,11 +33,12 @@ function Pulse(){
   this.mountains.position.z = -puppyPos + 10;
 
 
-  this.moon = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 , 2 ), new THREE.MeshBasicMaterial(0x00ffff))
-  this.moon.position.y = 10;
-  this.moon.position.x = -10;
-  this.moon.position.z = -puppyPos - 5;
-  this.body.add( this.moon );
+  this.moon = new Moon();
+  this.moon.body.position.y = 10;
+  this.moon.body.position.x = -10;
+  this.moon.body.position.z = -puppyPos - 5;
+  //this.moon.body.position.z = -15;
+  this.body.add( this.moon.body );
 
   this.water = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1000 , 1000  ) , new THREE.MeshPhongMaterial(0xffffff) );
   this.water.position.y = -.9;
@@ -49,11 +50,11 @@ function Pulse(){
 
 Pulse.prototype.update = function(){
 
-  this.moon.updateMatrixWorld();
-  G.uniforms.lightPos.value.set( 0 ,  0 , 0);
-  G.uniforms.lightPos.value.applyMatrix4( this.moon.matrixWorld );
-  G.light.position.copy( G.uniforms.lightPos.value );
-  G.lightMarker.position.copy( G.uniforms.lightPos.value );
+  this.moon.update();
+
+  G.uniforms.lightPos.value.copy( this.moon.globalPos );
+  G.light.position.copy( this.moon.globalPos );
+  G.lightMarker.position.copy( this.moon.globalPos );
 
   this.puppy.update();
 

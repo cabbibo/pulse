@@ -9,10 +9,11 @@ varying vec3 vMPos;
 void main(){
 
   vec3 lightDir = normalize( lightPos - vMPos );
+  
+  float match = max( 0. , dot( lightDir , -vMNorm ));
 
   vec3 col = texture2D( t_audio , vec2( vUv.y , 0. )).xyz;
 
-  float match = max( 0. , dot( lightDir , -vMNorm ));
 
   col *=  match; //vec3( match );
 

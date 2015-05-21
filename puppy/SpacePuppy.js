@@ -795,9 +795,9 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
       p2.add( G.v1 );
 
 
-      positions[ index * 3 + 3 ] = p2.x;
-      positions[ index * 3 + 4 ] = p2.y;
-      positions[ index * 3 + 5 ] = p2.z;
+      positions[ index * 3 + 6 ] = p2.x;
+      positions[ index * 3 + 7 ] = p2.y;
+      positions[ index * 3 + 8 ] = p2.z;
 
 
       p3.copy( p );
@@ -810,9 +810,9 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
       G.v1.multiplyScalar( Math.sin( tUp) * radius );
       p3.add( G.v1 );
 
-      positions[ index * 3 + 6 ] = p3.x;
-      positions[ index * 3 + 7 ] = p3.y;
-      positions[ index * 3 + 8 ] = p3.z;
+      positions[ index * 3 + 3 ] = p3.x;
+      positions[ index * 3 + 4 ] = p3.y;
+      positions[ index * 3 + 5 ] = p3.z;
 
 
 
@@ -824,7 +824,7 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
 
       n.crossVectors( G.v1 , G.v2 );
       n.normalize();
-      n.multiplyScalar( -1 );
+      n.multiplyScalar( 1 );
 
 
       normals[ index * 3 + 0 ] = n.x;
@@ -864,11 +864,12 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
   console.log( fs )
   var mat = new THREE.ShaderMaterial({
     uniforms:{
-      t_audio: G.uniforms.t_audio
+      t_audio: G.uniforms.t_audio,
+      lightPos: G.uniforms.lightPos,
     },
     vertexShader: vs,
     fragmentShader: fs,
-    side: THREE.BackSide,
+    //side: THREE.BackSide,
     //transparent: true,
   })
   //var mat = new THREE.MeshNormalMaterial({ side: THREE.BackSide });
