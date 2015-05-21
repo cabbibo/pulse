@@ -7,7 +7,7 @@ function City( size , params , buildingUniforms , wireUniforms ){
 	this.buildingPositions = [];
 
 	this.v1 = new THREE.Vector3();
-  this.v2 = new THREE.Vector3();
+ 	this.v2 = new THREE.Vector3();
 	this.upVec = new THREE.Vector3( 0 , 1 , 0 );
 
 
@@ -497,6 +497,16 @@ City.prototype.createBuildingMesh = function( basePaths , bs ){
 		geometry.merge( geo , m.matrix );
 
 	}
+
+	var vs = shaders.setValue( shaders.vs.building , 'SIZE' , G.fingers.tips.length );
+	var fs = shaders.fs.building;
+	var mat = new THREE.ShaderMaterial({
+		uniforms:{
+			touchers:{ type:"v3v", value:G.fingers.tips}
+		},
+		vertexShader:vs,
+		fragmentShader:fs,
+	})
 
 	return  new THREE.Mesh( geometry , mat );
 

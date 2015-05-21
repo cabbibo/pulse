@@ -1,6 +1,4 @@
-attribute float id;
 
-varying float vID;
 varying vec3 vDist;
 
 const int size = @SIZE;
@@ -25,8 +23,7 @@ vec3 getClosestFinger( vec3 p , out vec3 fing){
 }
 
 void main(){
-	
-	vID = id;
+
 
   vec3 mPos = ( modelMatrix * vec4( position ,1.)).xyz;
   vec3 closestFing = vec3( 1000000. );

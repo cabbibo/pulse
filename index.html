@@ -18,7 +18,10 @@
     <script src = "lib/leap.min.js"                         ></script>
     <script src = "lib/TrackballControls.js"                ></script>
     <script src = "lib/simplex-noise.js"                    ></script>
-        
+
+    <script src = "lib/VREffect.js"                         ></script>
+    <script src = "lib/VRControls.js"                       ></script>
+     
 
     <!-- MINE LIB -->
     <script src = "lib/ShaderLoader.js"                     ></script>
@@ -30,7 +33,8 @@
     <script src = "audio/AudioController.js"                ></script>
     <script src = "audio/UserAudio.js"                      ></script>
     <script src = "audio/AudioTexture.js"                   ></script>
-  
+    <script src = "audio/Stream.js"                         ></script>
+
         
     <!-- PATHS -->
     <script src = "path/Path.js"                            ></script>
@@ -81,10 +85,19 @@
 
 
       var camera, renderer, scene , controls , clock;
-      
+
+      var VR = false;
+      var effect;
+  
+
       var audioMesh;
 
       var leap = new Leap.Controller();
+
+      if( VR == true ){
+        leap.setOptimizeHMD(true);
+      }
+
 
       // Setting up shaders
       var shaders = new ShaderLoader( 'shaders' );
@@ -101,6 +114,9 @@
 
       shaders.load( 'vs-path' , 'path' , 'vertex'   );
       shaders.load( 'fs-path' , 'path' , 'fragment' );
+
+      shaders.load( 'vs-building' , 'building' , 'vertex'   );
+      shaders.load( 'fs-building' , 'building' , 'fragment' );
 
 
       // PANNING
@@ -229,11 +245,30 @@
 
         document.body.appendChild( renderer.domElement );
 
+
         window.addEventListener( 'resize', onWindowResize, false );
+        if( VR == true ){
+          window.addEventListener('dblclick', onDoubleClick , false );
+        }
+        textCreator =  new TextCreator( 100 );
+
+        if( VR == true ){
+
+          effect = new THREE.VREffect( renderer );
+          effect.setSize( window.innerWidth, window.innerHeight );
+
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
 
         clock = new THREE.Clock();
 
-        controls = new THREE.TrackballControls( camera );
+        if( VR == true ){
+          controls = new THREE.VRControls( camera );
+        }else{
+          controls = new THREE.TrackballControls( camera );
+        }
+
 
         G.light = new THREE.PointLight( 0xfffffff , 1 , 100 );
         scene.add( G.light );
@@ -241,17 +276,21 @@
         G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .3 , 1 ) , new THREE.MeshBasicMaterial() );
         scene.add( G.lightMarker );
 
-        G.fingers = new LeapFingers();
+
+        G.fingers = new LeapFingers( VR );
+
 
         G.fingers.addToScene( scene );
         leap.connect();
+
+
 
         pulse = new Pulse();
 
         var position = new THREE.Vector3(0, 0 , 0);
         var normal = new THREE.Vector3( 0 , 1 , 0 );
-        var x = 1;
-        var y = 1;
+        var x = 3;
+        var y = 3;
         var bufferDistance = .03;
 
         var body = new THREE.Object3D();
@@ -269,11 +308,25 @@
 
         touchPlaneBody = new TouchPlaneBody( G.touchPlane );
 
+
+        if( VR == true ){
+          G.touchPlane.body.position.y = -.4;
+         // G.city.body.position.z = -.0;
+        }else{
+          G.touchPlane.body.position.y = -.1;
+         // G.city.body.position.z = -.0;
+        }
+
+        //G.city.body.rotation.x = Math.PI / 2;
+
         G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
-        G.panPlane.forceMultiplier = 1;
+
+        G.panPlane.forceMultiplier = 50;
+
         G.panPlane.maxX = 80;
         G.panPlane.maxY = 80;
+
 
 
         pulse.body.position.y = -30
@@ -284,11 +337,14 @@
      
 
 
+
       }
 
       
       function animate(){
 
+
+        requestAnimationFrame( animate );
        
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;
@@ -299,27 +355,45 @@
         G.touchPlane.update();
         G.panPlane.update();
 
+
         controls.update();
         G.audio.update();
         
         pulse.update();
         
-        renderer.render( scene , camera );
 
-                requestAnimationFrame( animate );
+        if( VR == true ){
+          effect.render( scene, camera );
+        }else{
+          renderer.render( scene , camera );
+        }
+
+
 
 
       }
 
 
-      function onWindowResize() {
+      function onWindowResize(){
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+        if( VR == true ){
+          effect.setSize( window.innerWidth , window.innerHeight );
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
 
-			}
+
+      }
+
+      function onDoubleClick() {
+        if( VR == true ){
+          effect.setFullScreen( true );
+          controls.zeroSensor();
+        }
+      }
 
       function onLoad(){
 
