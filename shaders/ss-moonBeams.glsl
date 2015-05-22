@@ -2,7 +2,9 @@
 uniform sampler2D t_pos;
 uniform sampler2D t_oPos;
 uniform sampler2D t_audio;
+uniform sampler2D t_monk;
 uniform float puppyPos;
+uniform float ringRadius;
 
 uniform vec2 resolution;
 
@@ -23,7 +25,7 @@ void main(){
   vec3 vel    = pos.xyz - oPos.xyz;
   vec3 p      = pos.xyz;
 
-  vec3 toPos = vec3( 0. , 0. , -puppyPos );
+  vec3 toPos = vec3( 0. , 1. , -puppyPos );
   float life  = pos.w;
 
 
@@ -31,45 +33,54 @@ void main(){
 
   vec3 f = vec3( 0. );
 
+  float toDif = length(toPos - pos.xyz);
 
 
-  f +=  vec3( .0 , 0.003  * (  life - .5 )  * life, 0.01 * ( 1. - life ) );
-  f += curlNoise( pos.xyz * .4 ) * .003 * ( 1. - life );
+  //f +=  vec3( .0 , 0.003  * (  life - .5 )  * life, 0.01 * ( 1. - life ) );
+
+  f += vec3( .0 , .0002 * ( 1. / pow( clamp( pos.y, .1 , 1. ) , 2. ) ) , 0. );
+  f += normalize(toPos - pos.xyz) * .01;
+  f += curlNoise( pos.xyz * .4 ) * .009 * ( 1. - life );
 
 
   if( life > 1. ){
     life = 1.;
     vel = vec3( 0. );
-    f = vec3( 0. , .01 , 0. );
+    f = vec3( 0. , .004 , 0. );
+
   }
 
+  if( toDif < .05 ){ 
+    life = -10000.; 
+  }
+
+
+  life = clamp( length( toDif ) , 0. , 40. ) / 40.;
   life -= .0003 + (1. + length( a ) * .1 ) * rand( uv ) * .001;
 
   if( life < 0. ){
-    life = 1.1;
+    life = 10000.;
     vel = vec3( 0. );
-    p = vec3( uv.x -.5 , 0. , uv.y-.5 ) * .3;
+    f = vec3( 0. );
 
-    p = vec3( 0. , 0. , -30. );
+    p = texture2D( t_monk , vec2( uv.x , 0. )).xyz;
 
-    float t = ( uv.x * .5 + .5) * 3.14195 * 2. ;
+    float t = uv.y * 2. * 3.14159;
+    p.x += cos( t ) * ringRadius;
+    p.z += sin( t ) * ringRadius;
 
-    p.x += cos( t ) * (uv.y *.4+1.);
-    p.z += sin( t ) * (uv.y *.4+1.);
-
-    float mult = (uv.x - .5 );
-
-   p = vec3(  0., 0. , -floor( uv.x * 30. ) + uv.y  );
-    p = vec3( 30. * pow( uv.y ,.5 ), 0. , -(uv.y + .1) * 30. );
-    p = vec3( uv.x * .1 , -1. , 1. + uv.y * .1);
+    //p.z += rand( uv );
+    //p.x += rand( uv * vec2( 33.512 ,  752.123 ));
   }
+
+
 
 
 
 
   vel += f;
   vel *= .9;
-  p += vel * ( .6 + length( a ) * length( a ) * .2 );
+  p += vel * ( .6 + length( a ) * length( a ) * .1 );
 
 
 

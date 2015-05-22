@@ -160,6 +160,9 @@
       shaders.load( 'vs-moonBeamLines' , 'moonBeamLines' , 'vertex'     );
       shaders.load( 'fs-moonBeamLines' , 'moonBeamLines' , 'fragment'   );
 
+      shaders.load( 'vs-monk' , 'monk' , 'vertex'     );
+      shaders.load( 'fs-monk' , 'monk' , 'fragment'   );
+
 
 
       /*
@@ -205,6 +208,8 @@
       G.sliders = [];
       G.v1 = new THREE.Vector3();
       G.v2 = new THREE.Vector3();
+      G.v3 = new THREE.Vector3();
+      G.v4 = new THREE.Vector3();
 
 
 
@@ -349,10 +354,10 @@
 
 
 
-        pulse.body.position.y = -30
+        pulse.body.position.y = -15
 
-        pulse.addCity();
-        pulse.addPuppy();
+        //pulse.addCity();
+       // pulse.addPuppy();
 
      
 

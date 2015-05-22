@@ -2,7 +2,7 @@ function SpacePuppy( size ,  fingers , zPos ){
 
 	this.repelers = [];
   this.gems = [];
-  this.simSize = 128;
+  this.simSize = 16;
 
   this.puppyY = size * 1.5;
   this.puppyZ = -zPos;
