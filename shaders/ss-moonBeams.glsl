@@ -22,6 +22,8 @@ void main(){
   vec4 pos    = texture2D( t_pos  , uv );
   vec3 vel    = pos.xyz - oPos.xyz;
   vec3 p      = pos.xyz;
+
+  vec3 toPos = vec3( 0. , 0. , -puppyPos );
   float life  = pos.w;
 
 
@@ -31,7 +33,7 @@ void main(){
 
 
 
-  f +=  vec3( .0 , 0.003  * (  life - .5 )  * life, -0.01 * ( 1. - life ) );
+  f +=  vec3( .0 , 0.003  * (  life - .5 )  * life, 0.01 * ( 1. - life ) );
   f += curlNoise( pos.xyz * .4 ) * .003 * ( 1. - life );
 
 
@@ -54,8 +56,12 @@ void main(){
 
     p.x += cos( t ) * (uv.y *.4+1.);
     p.z += sin( t ) * (uv.y *.4+1.);
-   // p = vec3( (uv.x -.5) * 10. * ( uv.y + .1 ) , 0. , -(uv.y + 1.) * 10. );
 
+    float mult = (uv.x - .5 );
+
+   p = vec3(  0., 0. , -floor( uv.x * 30. ) + uv.y  );
+    p = vec3( 30. * pow( uv.y ,.5 ), 0. , -(uv.y + .1) * 30. );
+    p = vec3( uv.x * .1 , -1. , 1. + uv.y * .1);
   }
 
 

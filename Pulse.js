@@ -69,7 +69,7 @@ Pulse.prototype.addCity = function(){
 
   this.body.add( this.city.buildings );
   this.body.add( this.city.wire );
-  this.body.add( this.connection );
+  //this.body.add( this.connection );
 
   for( var i = 0; i < this.city.batteries.length; i++ ){
     this.body.add( this.city.batteries[i] );
