@@ -1,8 +1,8 @@
-function LeapFingers(){
+function LeapFingers( VR ){
 
   this.v1 = new THREE.Vector3();
 
-  this.VR = false;
+  this.VR = VR;
   this.fingers = [];
   this.positions = [];
   this.tips = [];

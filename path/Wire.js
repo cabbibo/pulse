@@ -2,11 +2,12 @@ function Wire( paths , uniforms ){
 
 	var geo = this.createGeometry( paths );
 
+	var vs = shaders.setValue( shaders.vs.path , 'SIZE' , G.fingers.tips.length )
 	var mat = new THREE.ShaderMaterial({
 
 		uniforms: uniforms,
 		attributes:{ id:{type:"f" , value:null} },
-		vertexShader: shaders.vs.path,
+		vertexShader: vs,
 		fragmentShader: shaders.fs.path,
 
 	});
