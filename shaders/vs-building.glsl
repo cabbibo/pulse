@@ -4,6 +4,9 @@ varying vec3 vDist;
 const int size = @SIZE;
 uniform vec3 touchers[ size ];
 
+varying vec3 vNorm;
+varying vec2 vUv;
+
 vec3 getClosestFinger( vec3 p , out vec3 fing){
   vec3 closestP = vec3(10000. );
   float closestD = 100000.;
@@ -29,13 +32,16 @@ void main(){
   vec3 closestFing = vec3( 1000000. );
 	vDist = getClosestFinger( mPos , closestFing);
 
+  vNorm = ( modelMatrix * vec4( normal ,0.)).xyz;
+  vUv = uv;
 
-  if( length( vDist ) < .05 ){
+
+  /*if( length( vDist ) < .05 ){
 
     mPos +=  vDist;// ) * .1;
     //mPos = closestFing;
+  }*/
 
-  }
 	gl_Position = projectionMatrix * viewMatrix * vec4( mPos , 1. );
 
 }

@@ -1,6 +1,9 @@
-uniform sampler2D t_pos;
+
+uniform sampler2D t_monk;
 varying float vDepth;
 varying float vLife;
+varying float vToggled;
+varying float vDist;
 
 const int depth = @DEPTH;
 
@@ -32,6 +35,8 @@ void main(){
     }*/
   }
 
+  vToggled = texture2D( t_monk , vec2( position.x , 0. )).a;
+
   vLife = p.w;
 
   vVel = p.xyz - p1.xyz;
@@ -39,5 +44,6 @@ void main(){
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4( p.xyz , 1. );
 
-
+  vDist = 1. / length(( modelViewMatrix * vec4( p.xyz , 1. )).xyz);
+  
 }

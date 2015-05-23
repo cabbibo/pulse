@@ -25,11 +25,11 @@ void main(){
   vec3 vel    = pos.xyz - oPos.xyz;
   vec3 p      = pos.xyz;
 
-  vec3 toPos = vec3( 0. , 1. , -puppyPos );
+  vec3 toPos = vec3( 0. , .5 , -puppyPos  );
   float life  = pos.w;
 
 
-  vec4 a = texture2D( t_audio , vec2( uv.x , 0. ) );
+  vec4 a = texture2D( t_audio , vec2( uv.y , 0. ) );
 
   vec3 f = vec3( 0. );
 
@@ -55,7 +55,10 @@ void main(){
   }
 
 
-  life = clamp( length( toDif ) , 0. , 40. ) / 40.;
+  if( life > 0. ){
+    life = clamp( length( toDif ) , 0. , 40. ) / 40.;
+  }
+
   life -= .0003 + (1. + length( a ) * .1 ) * rand( uv ) * .001;
 
   if( life < 0. ){

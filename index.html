@@ -4,10 +4,26 @@
     <style>
       body{ margin: 0px; }
       html{ overflow: hidden }
+      #stats{ 
+        position: absolute;
+        bottom: 0px;
+        left:0px;
+        z-index: 999;
+      }
     </style>
   </head>
 
   <body>
+
+    <!--
+
+    TODO:
+
+        lifeLines Shader
+        topPlane Shader should match theme
+
+
+    -->
 
 
 
@@ -16,6 +32,7 @@
     <script src = "lib/jquery.min.js"                       ></script>
     <script src = "lib/underscore.js"                       ></script>
     <script src = "lib/leap.min.js"                         ></script>
+    <script src = "lib/stats.min.js"                         ></script>
     <script src = "lib/TrackballControls.js"                ></script>
     <script src = "lib/simplex-noise.js"                    ></script>
 
@@ -95,6 +112,7 @@
   
 
       var audioMesh;
+      var stats = new Stats();
 
       var leap = new Leap.Controller();
 
@@ -217,13 +235,14 @@
       // Textures
       G.t = {}
 
-      G.t.matcap = THREE.ImageUtils.loadTexture('img/blood.jpg');
-      //G.t.normal = THREE.ImageUtils.loadTexture('img/t_n_snakeSkin.png');
-      G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
+     // G.t.matcap = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');
+      G.t.matcap = THREE.ImageUtils.loadTexture('img/matcaps/metal.jpg');
+      G.t.normal = THREE.ImageUtils.loadTexture('img/normals/snakeSkin.png');
+      //G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
 
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
 
-      G.t.sprite = THREE.ImageUtils.loadTexture('img/flare.png');
+      G.t.sprite = THREE.ImageUtils.loadTexture('img/sprites/flare.png');
 
 
 
@@ -256,12 +275,13 @@
         var h = window.innerHeight;
 
         camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 100 );
-        camera.position.z = .2;
+        camera.position.z = 0.3;
         camera.position.y = 0.1;
         camera.lookAt( new THREE.Vector3() );
 
 
         scene = new THREE.Scene();
+       // scene.fog = new THREE.Fog( 0x000000 , 3 , 50 )
 
         var dpr = window.devicePixelRatio || 1;
         renderer = new THREE.WebGLRenderer();
@@ -269,6 +289,9 @@
         renderer.setSize( window.innerWidth, window.innerHeight );
 
         document.body.appendChild( renderer.domElement );
+
+        stats.domElement.id = 'stats';
+        document.body.appendChild( stats.domElement );
 
 
         window.addEventListener( 'resize', onWindowResize, false );
@@ -347,17 +370,15 @@
         G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
 
-        G.panPlane.forceMultiplier = 50;
+        G.panPlane.forceMultiplier = 200;
 
-        G.panPlane.maxX = 80;
-        G.panPlane.maxY = 80;
+        G.panPlane.maxX = 15;
+        G.panPlane.maxY = 33;
 
 
 
-        pulse.body.position.y = -15
+        //pulse.body.position.y = -20
 
-        //pulse.addCity();
-       // pulse.addPuppy();
 
      
 
@@ -369,6 +390,7 @@
       function animate(){
 
 
+        stats.update();
         requestAnimationFrame( animate );
        
         uniforms.dT.value = clock.getDelta();

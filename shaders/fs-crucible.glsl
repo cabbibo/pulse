@@ -18,11 +18,11 @@ void main(){
   col *=  match; //vec3( match );
 
   if( vUv.y > .45 && vUv.y < .55 ){
-    col = vec3( 1. );
+    col = vec3( 1. ) * match;
   }
 
   if( vUv.y < .05 || vUv.y > .95 ){
-    col = vec3( 1. );
+    col = vec3( 1. ) * match;
   }
 
   gl_FragColor = vec4( col , 1. );

@@ -188,7 +188,10 @@ function Mountains(){
     transparent: true
   })*/
 
-  var mat = new THREE.MeshPhongMaterial(0xfffffff)
+  var mat = new THREE.MeshPhongMaterial({
+   color: 0x222222,
+   specular: 0x222222
+  })
   var lifeDisks = new THREE.Mesh( geo , mat )
 
   return lifeDisks;

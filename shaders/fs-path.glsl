@@ -18,6 +18,6 @@ void main(){
 	vec3 col = hsv( abs(cos(vID*.1 * slider1)) , slider2 , slider3 );
 
 
-	gl_FragColor = vec4( col , 1. );
+	gl_FragColor = vec4( vec3( .2 ) , 1. );
 
 }

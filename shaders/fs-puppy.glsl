@@ -72,9 +72,9 @@ void main(){
 
   vec2 semLU = semLookup( vEye , fNorm );
   vec4 sem = texture2D( t_matcap , semLU );
-  gl_FragColor = sem * aC; //vec4( 1. , .3 , .3 , 1.) *  sem; //vec4( vSEM.x , 0. , vSEM.y , 1. );
+  gl_FragColor = sem * aC * 2.; //vec4( 1. , .3 , .3 , 1.) *  sem; //vec4( vSEM.x , 0. , vSEM.y , 1. );
 
 
 
- gl_FragColor = vec4( (fNorm  * .5)  + .5  , 1. );
+// gl_FragColor = vec4( (fNorm  * .5)  + .5  , 1. );
 }

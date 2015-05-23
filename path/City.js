@@ -36,7 +36,10 @@ City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUnifor
 
 
 
-  var battMat =  new THREE.MeshNormalMaterial();
+  var battMat =  new THREE.MeshPhongMaterial({
+    color:0x333333,
+    specular: 0x999999
+  });
 
 
 	for( var i = 0; i < HARDCORD.length; i++ ){
@@ -50,79 +53,6 @@ City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUnifor
     // The direction and tangent of out connection
     var dir = new THREE.Vector3(1 , 0 , 0);
     var tan = new THREE.Vector3( 0 ,  0 , 1 );
-
-    /*dir.x = side - .5;
-    dir.z = 0;
-    dir.normalize();
-
-    tan.copy( dir );
-    tan.applyAxisAngle( this.upVec ,  dir.x * Math.PI / 2 );
-
-
-    if( side == 2  ){
-
-      dir.x = 0;
-      dir.z = 1;
-      dir.normalize();
-
-      tan.copy( dir );
-      tan.applyAxisAngle( this.upVec ,  Math.PI / 2 );
-
-    }
-
-
-    var outNess = rowNum - 1.5;
-    var tanAmount = rowNum - 1.5;
-
-   // var startPos = 
-   // outNess = -outNess;
-
-    var sideOffsetSize = 17;
-
-    var sideOffset = side * sideOffsetSize;
-
-    if( side == 2 ){
-      sideOffset = sideOffsetSize;
-    }
-    sideOffset -= sideOffsetSize / 2;
-
-    var startOut = 100;
-    var endOut = 180;
-    var range = endOut - startOut
-
-
-
-
-    var DTs = [];
-
-    // Start Position
-    var d = ( startOut + range * 0 ) ;
-    var t = tanAmount * 40  + sideOffset;
-    d *= totalSize;
-    t *= totalSize;
-    DTs.push([d,t]);
-
-    // Second Pos
-    var t = ( tanAmount * 40 + sideOffset  );
-    var d = ( startOut + range * .3333 );
-    d *= totalSize;
-    t *= totalSize;
-    DTs.push([d,t]);
-
-    // third Pos
-    var t = ( tanAmount * 40  + outNess * 60 + sideOffset );
-    var d = ( startOut + range * .66666 );
-    d *= totalSize;
-    t *= totalSize;
-    DTs.push([d,t]);
-
-
-    // connectionPos
-    var t = tanAmount * 40 + outNess * 600 + sideOffset;
-    var d = (( startOut + range * 1)+ 500 * Math.abs( outNess ));
-    d *= totalSize;
-    t *= totalSize;
-    DTs.push([d,t]);*/
 
 
 

@@ -236,7 +236,13 @@ function Cliff( size ){
     transparent: true
   })*/
 
-  var mat = new THREE.MeshPhongMaterial(0xfffffff)
+  var mat = new THREE.MeshPhongMaterial({
+    color: 0x444444,
+   specular: 0x444444,
+   shininess:20
+  })
+
+
   var lifeDisks = new THREE.Mesh( geo , mat )
 
   return lifeDisks;

@@ -18,7 +18,7 @@ void main(){
   gl_FragColor = vec4( a.xyz * match , 1.);//vec4( vec3( vUv.y) , 1. );
 
   if( vUv.y > .95 || vUv.y < .3){
-    gl_FragColor = vec4( 1. );
+    gl_FragColor = vec4( 1. ) * match;
   }
 
 }

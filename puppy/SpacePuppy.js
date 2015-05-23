@@ -2,7 +2,7 @@ function SpacePuppy( size ,  fingers , zPos ){
 
 	this.repelers = [];
   this.gems = [];
-  this.simSize = 16;
+  this.simSize = 64;
 
   this.puppyY = size * 1.5;
   this.puppyZ = -zPos;
@@ -703,7 +703,12 @@ SpacePuppy.prototype.createLifeLines = function( repelers ){
   geo.addAttribute( 'uv' , uv );
 
 
-  var lifeLines = new THREE.Line( geo , new THREE.LineBasicMaterial() , THREE.LinePieces  )
+
+  var lifeLines = new THREE.Line( geo , new THREE.LineBasicMaterial({
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    color: 0x222222
+  }) , THREE.LinePieces  )
   lifeLines.bases = bases;
   return lifeLines;
 
