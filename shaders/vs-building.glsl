@@ -1,8 +1,12 @@
 
+
+attribute float id;
+
 varying vec3 vDist;
+varying float vID;
 
 const int size = @SIZE;
-uniform vec3 touchers[ size ];
+uniform vec3 tips[ size ];
 
 varying vec3 vNorm;
 varying vec2 vUv;
@@ -12,7 +16,7 @@ vec3 getClosestFinger( vec3 p , out vec3 fing){
   float closestD = 100000.;
 
 	for( int i  = 0; i < size; i++ ){
-    vec3 p2 = touchers[i];
+    vec3 p2 = tips[i];
     vec3 dif = p2 - p;
     float len = length( dif );
     if( len < closestD ){
@@ -35,6 +39,7 @@ void main(){
   vNorm = ( modelMatrix * vec4( normal ,0.)).xyz;
   vUv = uv;
 
+  vID = id;
 
   /*if( length( vDist ) < .05 ){
 

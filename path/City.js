@@ -101,7 +101,9 @@ City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUnifor
 
   batteries.push( battery )
 
-  var buildings = this.createBuildingMesh( basePaths , 2.5 * totalSize , buildingUniforms );
+  console.log( 'BuildingMesh')
+  console.log( buildingUniforms )
+  var buildings = new BuildingMesh( basePaths , 2.5 * totalSize , buildingUniforms );
 
   var wireInfo = new Wire( finishedWires , wireUniforms );
 

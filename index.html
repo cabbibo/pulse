@@ -63,6 +63,7 @@
     <script src = "path/City.js"                            ></script>
     <script src = "path/TestPath.js"                        ></script>
     <script src = "path/HARDCORD.js"                        ></script>
+    <script src = "path/BuildingMesh.js"                    ></script>
 
 
 
@@ -200,7 +201,8 @@
         t_audio: { type:"t"  , value : null },
         dT:      { type: "f"  , value : 0             },
         time:    { type: "f"  , value : 0             },
-        fingers: { type: "v3" , value : []            },
+        fingers: { type: "v3v" , value : []            },
+        tips:    { type: "v3v" , value : []            },
 
         // MOON
         lightPos: {type:"v3" , value: new THREE.Vector3() },
@@ -329,6 +331,12 @@
 
 
         G.fingers.addToScene( scene );
+
+        for( var i = 0; i< G.fingers.tips.length; i++ ){
+          G.uniforms.tips.value.push( G.fingers.tips[i] );
+        }
+        console.log( G.uniforms.tips.value)
+
         leap.connect();
 
 
