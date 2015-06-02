@@ -53,7 +53,7 @@ function Pulse(){
   //this.moon.body.position.z = -15;
   this.body.add( this.moon.body );
 
-  this.water = new THREE.Mesh( new THREE.PlaneGeometry( 1000 , 1000  ) , 
+  this.water = new THREE.Mesh( new THREE.PlaneGeometry( 400 , 400 , 20 , 20 ) , 
     new THREE.ShaderMaterial({
       uniforms:{
         rainbow      : G.uniforms.rainbow,
@@ -69,7 +69,7 @@ function Pulse(){
       fragmentShader: shaders.fs.water,
     })
   );
-  this.water.position.y = -.9;
+  this.water.position.y = -.99;
   this.water.rotation.x = -Math.PI / 2;
   this.body.add( this.water );
 
@@ -77,11 +77,16 @@ function Pulse(){
   this.moonField = new MoonField( puppyPos );
   this.body.add( this.moonField.body );
 
+  this.pedestal = new Pedestal();
+  this.body.add( this.pedestal.body );
+  G.v1.set( 0 , 0 , puppyPos/4 )
+  this.pedestal.body.position.copy( G.v1 )
+
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
   positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
 
-  positions.push( new THREE.Vector3( 0 , 0 , puppyPos/2 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , puppyPos/4 ) );
 
   positions.push( new THREE.Vector3( 10 , 0 , -puppyPos/2 ) );
   positions.push( new THREE.Vector3( -10 , 0 , -puppyPos/2 ) );

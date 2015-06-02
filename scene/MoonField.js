@@ -119,6 +119,8 @@ MoonField.prototype.checkMonks = function( tips ){
   for( var i = 0; i < this.monks.positions.length; i++ ){
     
     G.v1.copy( this.monks.positions[i] );
+    G.v2.set( 0 , )
+    G.v1.add( G.v2 )
     G.v1.applyMatrix4( this.body.matrixWorld );
     G.v1.sub( tips[0] )
 
@@ -552,15 +554,15 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
                 // monk id        // Side id               // slice id
         index = monkBaseIndex + ( j * (( 3* 2*3) + 3) ) + ( k * 3 * 2)
 
-        this.setQuadPositions( positions , index , p1 , p2 , p3 , p4 );
-        this.setQuadNormals( normals , index , p1 , p2 , p3 , p4 );
-        this.setQuadUVs( uvs , index , u1 , u2 , u3 , u4 )
+        G.setQuadPositions( positions , index , p1 , p2 , p3 , p4 );
+        G.setQuadNormals( normals , index , p1 , p2 , p3 , p4 );
+        G.setQuadUVs( uvs , index , u1 , u2 , u3 , u4 )
 
-        this.setTriValue1( lookAts , index     , 0 , 0 , 0 );
-        this.setTriValue1( lookAts , index + 3 , 0 , 0 , 0 );
+        G.setTriValue1( lookAts , index     , 0 , 0 , 0 );
+        G.setTriValue1( lookAts , index + 3 , 0 , 0 , 0 );
 
-        this.setTriValue1( ids , index     , id , id , id );
-        this.setTriValue1( ids , index + 3 , id , id , id );
+        G.setTriValue1( ids , index     , id , id , id );
+        G.setTriValue1( ids , index + 3 , id , id , id );
 
 
       }
@@ -604,13 +606,13 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
       // monk id        // Side id             // slice id
       index = monkBaseIndex + ( j * (( 3* 2*3) + 3) ) + ( 3 * 3 * 2)
 
-      this.setTriValue3( positions , index , p1 , p2 , p3 );
-      this.setTriNormal( normals   , index , p1 , p2 , p3 );
+      G.setTriValue3( positions , index , p1 , p2 , p3 );
+      G.setTriNormal( normals   , index , p1 , p2 , p3 );
       
-      this.setTriValue2( uvs , index , u1 , u2 , u3 );
+      G.setTriValue2( uvs , index , u1 , u2 , u3 );
 
-      this.setTriValue1( ids ,  index , id , id , id );
-      this.setTriValue1( lookAts ,  index  , 0 , 0 , 0  );
+      G.setTriValue1( ids ,  index , id , id , id );
+      G.setTriValue1( lookAts ,  index  , 0 , 0 , 0  );
 
       
 
@@ -635,26 +637,26 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
     u3.x = 0; u3.y = 1;
     u4.x = 1; u4.y = 1;
 
-    this.setQuadPositions( positions , index , p1 , p2 , p3 , p4 )
-    this.setQuadNormals( normals , index , p1 , p2 , p3 , p4 )
-    this.setQuadUVs( uvs , index , u1 , u2 , u3 , u4 )
+    G.setQuadPositions( positions , index , p1 , p2 , p3 , p4 )
+    G.setQuadNormals( normals , index , p1 , p2 , p3 , p4 )
+    G.setQuadUVs( uvs , index , u1 , u2 , u3 , u4 )
 
-    this.setTriValue1( lookAts , index      , 1 , 1 , 1 );
-    this.setTriValue1( lookAts , index + 3  , 1 , 1 , 1 );
+    G.setTriValue1( lookAts , index      , 1 , 1 , 1 );
+    G.setTriValue1( lookAts , index + 3  , 1 , 1 , 1 );
 
-    this.setTriValue1( ids , index      , id , id , id ); 
-    this.setTriValue1( ids , index + 3  , id , id , id );
+    G.setTriValue1( ids , index      , id , id , id ); 
+    G.setTriValue1( ids , index + 3  , id , id , id );
 
     // Create an extra back face
-    this.setQuadPositions( positions , index + 6 , p4 , p2 , p3 , p1 )
-    this.setQuadNormals( normals , index+ 6 , p1 , p2 , p3 , p4 )
-    this.setQuadUVs( uvs , index , u4 , u2 , u3 , u1 )
+    G.setQuadPositions( positions , index + 6 , p4 , p2 , p3 , p1 )
+    G.setQuadNormals( normals , index+ 6 , p1 , p2 , p3 , p4 )
+    G.setQuadUVs( uvs , index , u4 , u2 , u3 , u1 )
 
-    this.setTriValue1( lookAts , index + 6     , 1 , 1 , 1 );
-    this.setTriValue1( lookAts , index + 6 + 3  , 1 , 1 , 1 );
+    G.setTriValue1( lookAts , index + 6     , 1 , 1 , 1 );
+    G.setTriValue1( lookAts , index + 6 + 3  , 1 , 1 , 1 );
 
-    this.setTriValue1( ids , index + 6    , id , id , id ); 
-    this.setTriValue1( ids , index + 6 + 3  , id , id , id );
+    G.setTriValue1( ids , index + 6    , id , id , id ); 
+    G.setTriValue1( ids , index + 6 + 3  , id , id , id );
 
   }
 
@@ -678,78 +680,6 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
 }
 
 
-MoonField.prototype.setTriValue3 = function( values , index , p1 , p2 , p3 ){
-
-  values[ index * 3 + 0  ] = p1.x;
-  values[ index * 3 + 1  ] = p1.y;
-  values[ index * 3 + 2  ] = p1.z;
-
-  values[ index * 3 + 3  ] = p3.x;
-  values[ index * 3 + 4  ] = p3.y;
-  values[ index * 3 + 5  ] = p3.z;
-
-  values[ index * 3 + 6  ] = p2.x;
-  values[ index * 3 + 7  ] = p2.y;
-  values[ index * 3 + 8  ] = p2.z;
-
-}
-
-MoonField.prototype.setTriValue2 = function( values , index , p1 , p2 , p3 ){
-
-  values[ index * 2 + 0  ] = p1.x;
-  values[ index * 2 + 1  ] = p1.y;
-
-  values[ index * 2 + 2  ] = p3.x;
-  values[ index * 2 + 3  ] = p3.y;
-
-  values[ index * 2 + 4  ] = p2.x;
-  values[ index * 2 + 5  ] = p2.y;
-
-}
-
-MoonField.prototype.setTriValue1 = function( values , index , p1 , p2 , p3 ){
-
-  values[ index + 0  ] = p1;
-  values[ index + 1  ] = p3;
-  values[ index + 2  ] = p3;
-
-}
-
-MoonField.prototype.setTriNormal = function( normals , index , p1 , p2 , p3 ){
-
-  G.v3.copy( p1 );
-  G.v3.sub( p2 );
-
-  G.v2.copy( p1 );
-  G.v2.sub( p3 );
-
-  G.v1.crossVectors( G.v2 , G.v3 );
-  G.v1.normalize();
-
-  this.setTriValue3( normals , index , G.v1 , G.v1 , G.v1 );
-
-}
-
-MoonField.prototype.setQuadPositions = function( positions , index , p1 , p2 , p3 , p4 ){
-
-  this.setTriValue3( positions , index , p1 , p2 , p3 );
-  this.setTriValue3( positions , index + 3 , p4 , p3 , p2 );
-
-}
-
-MoonField.prototype.setQuadUVs = function( uvs , index , p1 , p2 , p3 , p4 ){
-
-  this.setTriValue2( uvs , index , p1 , p2 , p3);
-  this.setTriValue2( uvs , index + 3 , p4 , p3 , p2 );
-}
-
-
-MoonField.prototype.setQuadNormals = function( normals , index , p1 , p2 , p3 , p4 ){
-
-  this.setTriNormal( normals , index , p1 , p2 , p3 );
-  this.setTriNormal( normals , index + 3  , p4 , p3 , p2 );
-
-}
 
 MoonField.prototype.createMonkBody = function(){
 

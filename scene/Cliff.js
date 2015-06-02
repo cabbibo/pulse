@@ -96,7 +96,7 @@ function Cliff( size ){
 
 
     // Cliff Side
-    positions[ index * 3 + 9 ] = p1.x;
+    positions[ index * 3 + 9 ]  = p1.x;
     positions[ index * 3 + 10 ] = p1.y;
     positions[ index * 3 + 11 ] = p1.z;
 
