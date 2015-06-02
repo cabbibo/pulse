@@ -6,10 +6,13 @@ uniform sampler2D t_posArray[ depth ];
 varying float vLife;
 varying float vToggled;
 varying float vDist;
+varying vec3 vVel;
 
 void main(){
 
   vec4 p = texture2D( t_posArray[0] , position.xy );
+  vec4 oP = texture2D( t_posArray[1] , position.xy );
+  vVel = p.xyz - oP.xyz;
   vLife = p.w;
 
  vToggled = texture2D( t_monk , vec2( position.x , 0. )).a;

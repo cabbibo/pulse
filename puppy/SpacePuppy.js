@@ -2,10 +2,12 @@ function SpacePuppy( size ,  fingers , zPos ){
 
 	this.repelers = [];
   this.gems = [];
-  this.simSize = 64;
+  this.simSize = 128;
 
   this.puppyY = size * 1.5;
   this.puppyZ = -zPos;
+
+  this.lifeOn = { type:"f" , value: 1 }
 
 
   this.size = size;
@@ -27,11 +29,17 @@ function SpacePuppy( size ,  fingers , zPos ){
 
   this.body.add( this.cube );
 
-  this.interface = this.createInterface();
-  this.interface.position.z = .9;
-  this.interface.rotation.x = -.5;
-  this.interface.position.y = -this.puppyY / 2;
-  this.body.add( this.interface )
+  console.log('FDINGS')
+  console.log( fingers )
+  this.interface = new Interface([
+    this.fingers[1],
+    this.fingers[6],
+  ])
+
+  this.interface.body.position.z = .9;
+  this.interface.body.rotation.x = -.5;
+  this.interface.body.position.y = -this.puppyY / 2;
+  this.body.add( this.interface.body )
 
 
 
@@ -66,20 +74,22 @@ function SpacePuppy( size ,  fingers , zPos ){
     cubeMatrix: { type:"m4" , value: this.cube.matrixWorld },
     mainBodyMatrix: { type:"m4" , value: this.body.matrixWorld },
     
-    dT:   G.uniforms.dT,
-    time: G.uniforms.time,
+    dT           : G.uniforms.dT,
+    time         : G.uniforms.time,
+    rainbow      : G.uniforms.rainbow,
+
 
     t_matcap     : { type:"t"    , value: G.t.matcap       },
     t_normal     : { type:"t"    , value: G.t.normal       },
     t_audio	     : { type:"t"    , value: G.audio.texture  },
-    fingers	     : { type:"v3"   , value: fingers          },
+    fingers      : { type:"v3"   , value: fingers          },
 
     repelers	   : { type:"v4v"  , value: this.repelers    },
 
-    returnPower     : { type:"f" , value: 30. },
-    repulsionPower  : { type:"f" , value: .06, constraints:[-300  , 0] },
-    repulsionRadius : { type:"f" , value: 1.3 , constraints:[ 0  , 1000] },
-    dampening       : { type:"f" , value: .6 , constraints:[ .8 , .999] },
+    returnPower     : { type:"f" , value: 4. },
+    repulsionPower  : { type:"f" , value: .02, constraints:[-300  , 0] },
+    repulsionRadius : { type:"f" , value: .4 , constraints:[ 0  , 1000] },
+    dampening       : { type:"f" , value: .9 , constraints:[ .8 , .999] },
 
       
 
@@ -164,7 +174,7 @@ function SpacePuppy( size ,  fingers , zPos ){
     var geometry = new THREE.Geometry();
 
     geometry.merge( t.geometry , t.matrix );
-    console.log( geometry.vertices[0] )
+
 
     var gem = new GEM({
 
@@ -188,13 +198,51 @@ function SpacePuppy( size ,  fingers , zPos ){
     this.gems.push( gem );
 
   }
+
 	
 }
 
 
 
+SpacePuppy.prototype.turnOffLifelines = function(){
 
+  //this.lifeOn.value = 0;
 
+ 
+  var s ={ 
+    v: this.lifeOn.value ,
+    uniform: this.lifeOn
+  }
+  var e ={ v: 0 }
+  new TWEEN.Tween( s )
+      .to( e , 1000. )
+      .easing( TWEEN.Easing.Exponential.InOut )
+      .onUpdate(function(e){ 
+        this.uniform.value = this.v;
+      })
+      .start();
+
+}
+
+SpacePuppy.prototype.turnOnLifelines = function(){
+
+  //this.lifeOn.value = 0;
+
+ 
+  var s ={ 
+    v: this.lifeOn.value ,
+    uniform: this.lifeOn
+  }
+  var e ={ v: 1 }
+  new TWEEN.Tween( s )
+      .to( e , 1000. )
+      .easing( TWEEN.Easing.Exponential.InOut )
+      .onUpdate(function(e){ 
+        this.uniform.value = this.v;
+      })
+      .start();
+
+}
 
 
 
@@ -224,14 +272,7 @@ SpacePuppy.prototype.update = function(){
     this.gems[i].update();
   }
 
-
-  for( var i = 0; i < this.interface.sliders.length; i++ ){
-    this.interface.sliders[i].update();
-  }
-  for( var i = 0; i < this.interface.buttons.length; i++ ){
-    this.interface.buttons[i].update();
-  }
-
+  this.interface.update();
 
 }
 
@@ -413,6 +454,7 @@ SpacePuppy.prototype.createCrucible = function( h , r , iR , iiR){
     uniforms:{
       lightPos: G.uniforms.lightPos,
       t_audio: G.uniforms.t_audio,
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: shaders.vs.crucible,
     fragmentShader: shaders.fs.crucible,
@@ -564,7 +606,9 @@ SpacePuppy.prototype.createLifeDisks = function( repelers ){
   console.log( fs )
   var mat = new THREE.ShaderMaterial({
     uniforms:{
-      t_audio: G.uniforms.t_audio
+      t_audio: G.uniforms.t_audio,
+      lifeOn: this.lifeOn,
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: vs,
     fragmentShader: fs,
@@ -703,13 +747,23 @@ SpacePuppy.prototype.createLifeLines = function( repelers ){
   geo.addAttribute( 'uv' , uv );
 
 
-
-  var lifeLines = new THREE.Line( geo , new THREE.LineBasicMaterial({
+  var vs = shaders.vs.lifeLines;
+  var fs = shaders.setValue( shaders.fs.lifeLines , 'NUMDISKS' , repelers.length )
+  var mat = new THREE.ShaderMaterial({
+    uniforms:{
+      t_audio: G.uniforms.t_audio,
+      lifeOn: this.lifeOn,
+      rainbow: G.uniforms.rainbow
+    },
+    vertexShader: vs,
+    fragmentShader: fs,
     transparent: true,
-    blending: THREE.AdditiveBlending,
-    color: 0x222222
-  }) , THREE.LinePieces  )
+    blending: THREE.AdditiveBlending
+  })
+
+  var lifeLines = new THREE.Line( geo , mat , THREE.LinePieces  )
   lifeLines.bases = bases;
+  lifeLines.frustumCulled = false;
   return lifeLines;
 
 
@@ -874,6 +928,8 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
     uniforms:{
       t_audio: G.uniforms.t_audio,
       lightPos: G.uniforms.lightPos,
+      lifeOn: this.lifeOn,
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: vs,
     fragmentShader: fs,
@@ -888,56 +944,7 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
 
 }
 
-SpacePuppy.prototype.createInterface = function(){
 
-  var interface = new THREE.Object3D();
-
-  interface.buttons = [];
-  interface.sliders = [];
-
-  var indexFingers = [
-    this.fingers[1],
-    this.fingers[6]
-  ];
-
-  for( var  i = 0; i < 6; i++ ){
-
-    var body = new THREE.Object3D();
-    body.position.y =  .06  * Math.floor( i / 3 );
-    body.position.x =  .06  * ( i % 3) ;
-
-    var button = new ToggleButton( .05 , indexFingers , body , .01 );
-
-    var string = 'toggle' + ( i + 1 )
-    var u = G.uniforms[ string ];
-    button.linkUniform( u );
-
-    interface.add( button.body );
-    interface.buttons.push( button);
-
-  }
-
-  for( var  i = 0; i < 3; i++ ){
-
-    var body = new THREE.Object3D();
-    body.position.x =  .06 * 3 + i * .03;
-    body.position.y = .03;
-
-    var slider = new Slider( .1 , indexFingers , body , .01 );
-
-    var string = 'slider' + ( i+ 1 )
-    var u = G.uniforms[ string ];
-    slider.linkUniform( u );
- 
-    interface.add( slider.body )
-    interface.sliders.push( slider );
-   
-
-  }
-
-  return interface;
-
-}
 
 
 

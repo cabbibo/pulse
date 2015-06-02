@@ -1,11 +1,17 @@
 function Moon(){
   
-  this.body = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 , 2 ), new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-   // wireframe: true
-  }))
+  var mat = new THREE.ShaderMaterial({
+    uniforms:G.uniforms,
+    vertexShader: shaders.vs.moon,
+    fragmentShader: shaders.fs.moon,
+  });
+
+  this.body = new THREE.Mesh( new THREE.IcosahedronGeometry( 2 , 2 ), mat );
 
   this.globalPos = new THREE.Vector3();
+
+  var geo = new THREE.Geometry();
+  
 
   
 

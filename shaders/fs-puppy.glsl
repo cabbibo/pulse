@@ -3,6 +3,7 @@ uniform sampler2D t_normal;
 uniform sampler2D t_audio;
 uniform sampler2D t_matcap;
 uniform float time;
+uniform float rainbow;
 
 uniform vec3 color2;
 uniform vec3 color1;
@@ -36,6 +37,8 @@ varying float vLife;
 
 $uvNormalMap
 $semLookup
+$getRainbow
+
 
 void main(){
 
@@ -54,7 +57,7 @@ void main(){
   float lamb = max( 0. , dot( -vLightDir , fNorm ));
   float refl = max( 0. , dot( reflect( vLightDir , fNorm  )  , vCamVec ));
  // float refl = vMPos - lightPos
-  float fr = max( 0. , dot( vCamVec , vMNorm ));
+  float fr = max( 0. , dot( vCamVec , fNorm ));
   float iFR = 1. - fr;
 
   vec3 a = texture2D( t_audio , vec2( abs(sin(dot( reflect( vLightDir , fNorm  )  , vCamVec ))) , 0. ) ).xyz *iFR;
@@ -72,7 +75,15 @@ void main(){
 
   vec2 semLU = semLookup( vEye , fNorm );
   vec4 sem = texture2D( t_matcap , semLU );
-  gl_FragColor = sem * aC * 2.; //vec4( 1. , .3 , .3 , 1.) *  sem; //vec4( vSEM.x , 0. , vSEM.y , 1. );
+
+  vec4 col = sem * aC * 2.;
+
+  float vRainbow = getRainbow();
+  if( vRainbow < rainbow ){
+    col.xyz *= fNorm * .5 + .5 ;
+    col.xyz += aC.xyz * fr;
+  }
+  gl_FragColor = col; //vec4( 1. , .3 , .3 , 1.) *  sem; //vec4( vSEM.x , 0. , vSEM.y , 1. );
 
 
 

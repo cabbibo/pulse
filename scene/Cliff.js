@@ -222,30 +222,26 @@ function Cliff( size ){
 
 
 
- /* var vs = shaders.vs.lifeDisks;
-  var fs = shaders.setValue( shaders.fs.lifeDisks , 'NUMDISKS' , repelers.length )
-
-  console.log( fs )
   var mat = new THREE.ShaderMaterial({
     uniforms:{
-      t_audio: G.uniforms.t_audio
+      rainbow      : G.uniforms.rainbow,
+      lightPos     : G.uniforms.lightPos,
+
+
+      t_matcap     : { type:"t"    , value: G.t.matcap       },
+      t_normal     : { type:"t"    , value: G.t.normal       },
+      t_audio      : { type:"t"    , value: G.audio.texture  },
+
     },
-    vertexShader: vs,
-    fragmentShader: fs,
-    side: THREE.DoubleSide,
-    transparent: true
-  })*/
-
-  var mat = new THREE.MeshPhongMaterial({
-    color: 0x444444,
-   specular: 0x444444,
-   shininess:20
-  })
+    vertexShader: shaders.vs.cliff,
+    fragmentShader: shaders.fs.cliff,
+  });
 
 
-  var lifeDisks = new THREE.Mesh( geo , mat )
 
-  return lifeDisks;
+  var cliff = new THREE.Mesh( geo , mat )
+
+  return cliff;
 
 
 }

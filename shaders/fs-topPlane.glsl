@@ -4,6 +4,7 @@ uniform vec3 touchers[ size ];
 uniform float touching;
 uniform float bufferDistance;
 uniform vec2 scale;
+uniform float rainbow;
 
 varying float vDist; // .w is which toucher
 varying vec3 vNorm;
@@ -11,9 +12,17 @@ varying vec3 vNorm;
 const float bandSize = .9;
 varying vec2 vUv;
 
+$getRainbow
+
+
 void main(){
 
-	vec3 baseCol = vNorm * .5 + .5;
+	vec3 baseCol = vec3( max( 0., dot( vNorm , vec3( 0., 1., 0. ) )));
+
+	float vRainbow = getRainbow();
+	if( vRainbow < rainbow ){
+		baseCol = vNorm * .5 + .5;
+	}
 
 	vec4 col = vec4( baseCol , 0. );
 	

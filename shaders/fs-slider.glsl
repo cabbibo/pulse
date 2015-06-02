@@ -1,13 +1,20 @@
 
 uniform vec2 scale;
 uniform float filled;
-
+uniform float rainbow;
 
 varying vec2 vUv;
+$hsv
+$getRainbow
 
 void main(){
 
 	vec3 baseCol = vec3( 1. );
+
+	float vRainbow = getRainbow();
+	if( vRainbow < rainbow ){
+		baseCol = hsv( abs(sin(vUv.y * 1.)) , 1. , 1. );
+	}
 
 	vec4 col = vec4( baseCol , .2 );
 

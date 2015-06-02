@@ -22,7 +22,9 @@ function Slider( size , touchers , body , bufferDistance ){
     bufferDistance  : { type : "f"   , value : bufferDistance },
     scale           : { type : "v2"  , value : scale          },
     filled          : { type : "f"   , value : 0              },
-    distanceCutoff  : { type : "f"   , value : .03            }
+    distanceCutoff  : { type : "f"   , value : .03            },
+
+    rainbow: G.uniforms.rainbow
 
   }
 

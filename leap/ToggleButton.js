@@ -22,7 +22,8 @@ function ToggleButton( size , touchers , body , bufferDistance ){
     touching:{ type: "f" , value: 0 },
     bufferDistance: { type:"f" , value: bufferDistance },
     scale: { type:"v2" , value: scale },
-    distanceCutoff: { type:"f", value: .1 }
+    distanceCutoff: { type:"f", value: .1 },
+    rainbow: G.uniforms.rainbow
 
   }
 

@@ -1,23 +1,24 @@
 
+uniform float rainbow;
 uniform float slider1;
 uniform float slider2;
 uniform float slider3;
+uniform sampler2D t_audio;
 varying float vID;
 
-vec3 hsv(float h, float s, float v)
-{
-    
-  return mix( vec3( 1.0 ), clamp( ( abs( fract(
-    h + vec3( 3.0, 2.0, 1.0 ) / 3.0 ) * 6.0 - 3.0 ) - 1.0 ), 0.0, 1.0 ), s ) * v;
-}
 
+$getRainbow
+$hsv
 
 void main(){
 	
 
-	vec3 col = hsv( abs(cos(vID*.1 * slider1)) , slider2 , slider3 );
+  vec4 col = texture2D( t_audio , vec2( abs(cos(vID*.7 * slider1)) , 0. ));
+  float vRainbow = getRainbow();
+  if( vRainbow < rainbow ){
+    col.xyz *= hsv( abs(cos(vID*.5 * slider1)) , slider2 , slider3 );
+  }
 
-
-	gl_FragColor = vec4( vec3( .2 ) , 1. );
+	gl_FragColor = col;
 
 }

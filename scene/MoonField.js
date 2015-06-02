@@ -4,10 +4,10 @@ function MoonField(puppyPos){
 
   this.lookPos = new THREE.Vector3();
 
-  this.depth = 16;
-  this.joints = 4;
+  this.depth = 32;
+  this.joints = 8;
   this.jointSize = this.depth / this.joints;
-  this.size = 128;
+  this.size = 16;
   var ss = shaders.ss.moonBeams;
 
   this.puppyPos = puppyPos;
@@ -54,6 +54,7 @@ function MoonField(puppyPos){
       t_posArray: { type:"tv" , value: this.jointArray },
       t_monk: this.t_monk,
       t_audio: G.uniforms.t_audio,
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: vs,
     fragmentShader: shaders.fs.moonBeams,
@@ -77,6 +78,7 @@ function MoonField(puppyPos){
       t_posArray: { type:"tv" , value: this.jointArray },
       t_monk: this.t_monk,
       t_audio: G.uniforms.t_audio,
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: vs,
     fragmentShader: shaders.fs.moonBeamLines,
@@ -770,7 +772,8 @@ MoonField.prototype.createMonkBody = function(){
       t_monk:this.t_monk,
       t_oMonk:this.t_oMonk,
       height:{ type:"f", value: height },
-      lookPos: { type:"v3" , value: this.lookPos }
+      lookPos: { type:"v3" , value: this.lookPos },
+      rainbow: G.uniforms.rainbow
     },
     vertexShader: shaders.vs.monk,
     fragmentShader: shaders.fs.monk,

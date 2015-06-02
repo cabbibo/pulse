@@ -35,6 +35,7 @@
     <script src = "lib/stats.min.js"                         ></script>
     <script src = "lib/TrackballControls.js"                ></script>
     <script src = "lib/simplex-noise.js"                    ></script>
+    <script src = "lib/Tween.js"                            ></script>
 
     <script src = "lib/VREffect.js"                         ></script>
     <script src = "lib/VRControls.js"                       ></script>
@@ -52,6 +53,8 @@
     <script src = "audio/AudioController.js"                ></script>
     <script src = "audio/UserAudio.js"                      ></script>
     <script src = "audio/AudioTexture.js"                   ></script>
+    <script src = "audio/AudioBuffer.js"                    ></script>
+    <script src = "audio/BufferedAudio.js"                  ></script>
     <script src = "audio/Stream.js"                         ></script>
 
         
@@ -81,6 +84,7 @@
     <script src = "puppy/RepelerMesh.js"                    ></script>
     <script src = "puppy/GEM.js"                            ></script>
     <script src = "puppy/Crucible.js"                       ></script>
+    <script src = "puppy/Interface.js"                      ></script>
     <script src = "puppy/SpacePuppy.js"                     ></script>
     
     <!-- SCENE -->
@@ -88,6 +92,7 @@
     <script src = "scene/Moon.js"                           ></script>
     <script src = "scene/MoonField.js"                      ></script>
     <script src = "scene/Mountains.js"                      ></script>
+    <script src = "scene/AudioField.js"                     ></script>
 
     <!-- PULSE -->
     <script src = "Pulse.js"                                ></script>
@@ -166,6 +171,9 @@
       shaders.load( 'fs-lifeBases' , 'lifeBases' , 'fragment' );
       shaders.load( 'vs-lifeBases' , 'lifeBases' , 'vertex' );
 
+      shaders.load( 'fs-lifeLines' , 'lifeLines' , 'fragment' );
+      shaders.load( 'vs-lifeLines' , 'lifeLines' , 'vertex' );
+
       shaders.load( 'fs-crucible' , 'crucible' , 'fragment' );
       shaders.load( 'vs-crucible' , 'crucible' , 'vertex' );
 
@@ -181,6 +189,18 @@
 
       shaders.load( 'vs-monk' , 'monk' , 'vertex'     );
       shaders.load( 'fs-monk' , 'monk' , 'fragment'   );
+
+      shaders.load( 'vs-moon' , 'moon' , 'vertex'     );
+      shaders.load( 'fs-moon' , 'moon' , 'fragment'   );
+
+      shaders.load( 'vs-mountains' , 'mountains' , 'vertex'     );
+      shaders.load( 'fs-mountains' , 'mountains' , 'fragment'   );
+
+      shaders.load( 'vs-cliff' , 'cliff' , 'vertex'     );
+      shaders.load( 'fs-cliff' , 'cliff' , 'fragment'   );
+
+      shaders.load( 'vs-water' , 'water' , 'vertex'     );
+      shaders.load( 'fs-water' , 'water' , 'fragment'   );
 
 
 
@@ -220,6 +240,8 @@
         toggle5 : { type: "f" , value: 0 },
         toggle6 : { type: "f" , value: 0 },
 
+        rainbow : { type: "f" , value: 0 },
+
       }
 
       var G = {};
@@ -238,13 +260,13 @@
       G.t = {}
 
      // G.t.matcap = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');
-      G.t.matcap = THREE.ImageUtils.loadTexture('img/matcaps/metal.jpg');
-      G.t.normal = THREE.ImageUtils.loadTexture('img/normals/snakeSkin.png');
-      //G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
+      G.t.matcap = THREE.ImageUtils.loadTexture('assets/img/matcaps/metal.jpg');
+      G.t.normal = THREE.ImageUtils.loadTexture('assets/img/normals/snakeSkin.png');
+      //G.t.normal = THREE.ImageUtils.loadTexture('assets/img/beef.jpg');
 
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
 
-      G.t.sprite = THREE.ImageUtils.loadTexture('img/sprites/flare.png');
+      G.t.sprite = THREE.ImageUtils.loadTexture('assets/img/sprites/flare.png');
 
 
 
@@ -254,7 +276,33 @@
       G.uniforms.t_audio.value = G.audio.texture;
 
 
-      var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
+      //var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
+
+
+      var toLoadAudioArray = [
+        "assets/audio/df/1.mp3",
+        "assets/audio/df/5.mp3",
+        "assets/audio/df/4.mp3",
+      //  "assets/audio/df/2.mp3",
+      //  "assets/audio/df/3.mp3",
+      ];
+
+      G.audioBuffers = [];
+
+      for( var i = 0; i < toLoadAudioArray.length; i++ ){
+
+        var audioBuffer = new AudioBuffer( G.audio.ctx , toLoadAudioArray[i] );
+
+        addLoad();
+
+        audioBuffer.addLoadEvent( function(){
+          console.log( 'yup')
+          onLoad();
+        });
+
+        G.audioBuffers.push( audioBuffer )
+
+      }
 
 
       //Muting audio, so we don't have feedback
@@ -276,7 +324,7 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 100 );
+        camera = new THREE.PerspectiveCamera( 100 , w/h , .01 , 100 );
         camera.position.z = 0.3;
         camera.position.y = 0.1;
         camera.lookAt( new THREE.Vector3() );
@@ -385,7 +433,8 @@
 
 
 
-        //pulse.body.position.y = -20
+        //pulse.body.position.y = 15
+        //pulse.body.position.y = -30
 
 
      
@@ -406,9 +455,15 @@
 
         var f = leap.frame();
 
-        G.fingers.update( f );
-        G.touchPlane.update();
-        G.panPlane.update();
+        if( f.valid ){ 
+          G.fingers.update( f );
+        }
+
+        G.touchPlane.update(f.valid);
+        G.panPlane.update(f.valid);
+        
+
+        TWEEN.update();
 
 
         controls.update();
@@ -459,6 +514,10 @@
           animate();
         }
 
+      }
+
+      function addLoad(){
+        neededToLoad ++;
       }
 
 

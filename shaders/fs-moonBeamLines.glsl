@@ -1,11 +1,14 @@
 
 uniform sampler2D t_audio;
+uniform float rainbow;
 
 varying vec3 vVel;
 varying float vDepth;
 varying float vLife;
 varying float vToggled;
 varying float vDist;
+
+$getRainbow
 
 void main(){
 
@@ -20,10 +23,15 @@ void main(){
   if( multiplier == 0. ){ discard; }
 
   vec4 a = texture2D( t_audio , vec2( 1. - vDepth , 0.));
+
+  vec4 col = a * 4. * clamp( vDist * 3. , 0. , 1. ) * clamp( vLife * 40. , 0. , 1.  ) * (1. - vDepth);
+
+  float vRainbow = getRainbow();
+  if( vRainbow < rainbow ){
+    col += a * vec4( normalize( vVel ) * .5 + .5 , 1. );
+  }
   //gl_FragColor = vec4( 1.,.3,0.,1. )* vDepth + vec4( 0. , .3 , 1. , 1. ) * ( 1. - vDepth );
-  gl_FragColor = a *  clamp( vDist * 3. , 0. , 1. ) * clamp( vLife * 40. , 0. , 1.  ) * (1. - vDepth);// vec4( (1. - vDepth) * normalize( vVel ) * .5 + .5 ,( 1. - vDepth) );// vec4( 1.,.3,0.,1. )* vDepth + vec4( 0. , .3 , 1. , 1. ) * ( 1. - vDepth );
-
-
+  gl_FragColor = col;
 
   /*if( vLife > 4. || vLife < .4 ){
     gl_FragColor = vec4( 0. );
