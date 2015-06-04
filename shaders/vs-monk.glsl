@@ -4,6 +4,7 @@ uniform sampler2D t_audio;
 uniform float height;
 uniform vec3 lookPos;
 
+
 attribute float id;
 attribute float lookAt;
 
@@ -30,11 +31,11 @@ void main(){
 
   vec4 a = texture2D( t_audio , vec2( id , 0. ));
 
-  vNorm = normalize( (modelMatrix * vec4( normal , 0. )).xyz );
+ 
+
+  // Head
   if( lookAt > .5 ){
-
-    pos = monkPos.xyz + vec3( 0. , height , 0. ); //+ ( monkVel * 10. );
-
+    pos = monkPos.xyz + vec3( 0. , height * .8 , 0. ); //+ ( monkVel * 10. );
   }
 
   vec3 look = cameraPosition;
@@ -42,9 +43,42 @@ void main(){
     look = lookPos;
   }
 
-  look = vec3( 0. , 0. , -30. );
+ /* look = vec3( 0. , 0. , -30. );
+  vec3 look2 = cameraPosition;
 
-  vec3 dif = look - pos.xyz;//( modelMatrix * vec4( pos , 1. ) ).xyz;
+  float d  = length( look - pos.xyz );
+  float d2 = length( look - pos.xyz );
+
+  look = mix( look , look2 );*/
+
+  vec3 dif =  vec3( 0. , 0. , -30. ) - pos.xyz;
+  if( lookAt < .5 ){
+    //dif =  vec3( 0. , 0. , -30. ) - pos.xyz;
+  }else{
+    vec3 d1 = dif;
+    vec3 d2 = lookPos - ( modelMatrix * vec4( pos , 1. ) ).xyz;
+    float l1 = length( d1 );
+    float l2 = length( d2 );
+    float l = pow( (l1 / l2 ) , .2 ) * .5;
+
+    vec3 dd = d1 - d2;
+
+    // dot product
+    float dp = dot( d1 , d2 );
+
+
+    // WE GOTTA FIGURE THIS ONE OUT!!!
+    if( dp < 0. ){
+    //  l = 0.;
+    }
+
+    dif = d1 - dd * min( l , 1. );
+
+    //dif = vec3( 1. , 0. , 0. );
+  }
+
+
+
   dif = normalize( dif  );
 
   dif.y +=  length( a ) * .2;
@@ -63,8 +97,11 @@ void main(){
   );
 
 
-  pos = pos + ( rot * position );// * ( vec3( 1. )  + -monkVel * 2000. * uv.y * ( 1. - monkPos.w)  ) );
-
+  if( lookAt < .5 ){
+    pos = pos + ( rot * position );// * ( vec3( 1. )  + -monkVel * 2000. * uv.y * ( 1. - monkPos.w)  ) );
+  }else{
+    pos = pos + ( rot * ( position + vec3( 0. , 0. , -.03 )));
+  }
 
   vNorm = normalize( (modelMatrix * vec4( rot * normal , 0. )).xyz );
 

@@ -7,7 +7,7 @@ function MoonField(puppyPos){
   this.depth = 32;
   this.joints = 8;
   this.jointSize = this.depth / this.joints;
-  this.size = 16;
+  this.size = 64;
   var ss = shaders.ss.moonBeams;
 
   this.puppyPos = puppyPos;
@@ -93,7 +93,7 @@ function MoonField(puppyPos){
   this.body.add( this.lines );
 
 
- // this.toggleAllMonks();
+  this.toggleAllMonks();
 
 
 }
@@ -119,7 +119,7 @@ MoonField.prototype.checkMonks = function( tips ){
   for( var i = 0; i < this.monks.positions.length; i++ ){
     
     G.v1.copy( this.monks.positions[i] );
-    G.v2.set( 0 , )
+    G.v2.set( 0 , .1 , 0. );
     G.v1.add( G.v2 )
     G.v1.applyMatrix4( this.body.matrixWorld );
     G.v1.sub( tips[0] )
@@ -468,7 +468,7 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
 
 
   var baseVerts = sides * (( 3 * 2 * 3 ) + 3);
-  var headVerts = 3 * 2 * 2;
+  var headVerts = 3 * 6;
   var vertsPerMonk = ( baseVerts + headVerts );
   var totalVerts = vertsPerMonk * this.size;
 
@@ -535,7 +535,7 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
         p4.y = hU;
         p4.z = rU * Math.sin( tU );
 
-        G.v1.set( 0 , 0 , baseRadius * .5 )
+        G.v1.set( 0 , 0 , 0 )
 
         p1.add( G.v1 );
         p2.add( G.v1 );
@@ -585,7 +585,7 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
       p3.y = height;
       p3.z = 0;
 
-      G.v1.set( 0 , 0 , baseRadius * .5  )
+      G.v1.set( 0 , 0 ,0.)// baseRadius * .5  )
 
       p1.add( G.v1 );
       p2.add( G.v1 );
@@ -647,6 +647,40 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
     G.setTriValue1( ids , index      , id , id , id ); 
     G.setTriValue1( ids , index + 3  , id , id , id );
 
+    p1.x = -faceSize;  p1.y = -faceSize * 1.618;  p1.z = baseRadius * -.3;
+    p2.x =  faceSize;  p2.y = -faceSize * 1.618;  p2.z = baseRadius * -.3;
+    p3.x = -faceSize;  p3.y =  faceSize * 1.618;  p3.z = baseRadius * -.3;
+    p4.x =  faceSize;  p4.y =  faceSize * 1.618;  p4.z = baseRadius * -.3;
+
+
+
+    G.v1.set( 0,0,baseRadius )
+    G.setTriValue3( positions , index + 6 , p1 , G.v1 , p2 );
+    G.setTriNormal( normals , index + 6 , p1 , G.v1 , p2 );
+    G.setTriValue2( uvs , index + 6 , u1 , u2 , u3 );
+    G.setTriValue1( lookAts , index  + 6  , 1 , 1 , 1 );
+    G.setTriValue1( ids , index + 6  , id , id , id ); 
+    G.v1.set( 0,0,baseRadius )
+    G.setTriValue3( positions , index + 9 , p2 ,  G.v1,p4 );
+    G.setTriNormal( normals , index + 9 , p2 ,  G.v1,p4  );
+    G.setTriValue2( uvs , index + 9 , u1 , u2 , u3 );
+    G.setTriValue1( lookAts , index  + 9  , 1 , 1 , 1 );
+    G.setTriValue1( ids , index + 9  , id , id , id ); 
+    G.v1.set( 0,0,baseRadius )
+    G.setTriValue3( positions , index + 12 , p4 ,  G.v1,p3 );
+    G.setTriNormal( normals , index + 12 , p4 ,  G.v1,p3 );
+    G.setTriValue2( uvs , index + 12 , u1 , u2 , u3 );
+    G.setTriValue1( lookAts , index  + 12  , 1 , 1 , 1 );
+    G.setTriValue1( ids , index + 12  , id , id , id ); 
+    G.v1.set( 0,0,baseRadius )
+    G.setTriValue3( positions , index + 15, p3 , G.v1,p1 );
+    G.setTriNormal( normals , index + 15, p3 , G.v1,p1 );
+    G.setTriValue2( uvs , index + 15, u1 , u2 , u3 );
+    G.setTriValue1( lookAts , index  + 15 , 1 , 1 , 1 );
+    G.setTriValue1( ids , index + 15 , id , id , id ); 
+/*
+
+
     // Create an extra back face
     G.setQuadPositions( positions , index + 6 , p4 , p2 , p3 , p1 )
     G.setQuadNormals( normals , index+ 6 , p1 , p2 , p3 , p4 )
@@ -656,7 +690,7 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
     G.setTriValue1( lookAts , index + 6 + 3  , 1 , 1 , 1 );
 
     G.setTriValue1( ids , index + 6    , id , id , id ); 
-    G.setTriValue1( ids , index + 6 + 3  , id , id , id );
+    G.setTriValue1( ids , index + 6 + 3  , id , id , id );*/
 
   }
 
@@ -685,7 +719,7 @@ MoonField.prototype.createMonkBody = function(){
 
 
 
-  var height = .06;
+  var height = .09;
   var baseRadius = .03;
   var faceSize = .01;
   var sides = 6;
@@ -702,7 +736,7 @@ MoonField.prototype.createMonkBody = function(){
       t_monk:this.t_monk,
       t_oMonk:this.t_oMonk,
       height:{ type:"f", value: height },
-      lookPos: { type:"v3" , value: this.lookPos },
+      lookPos: { type:"v3" , value: G.uniforms.tips.value[1] },
       rainbow: G.uniforms.rainbow
     },
     vertexShader: shaders.vs.monk,

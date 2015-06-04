@@ -47,6 +47,7 @@
     <script src = "lib/PhysicsRenderer.js"                  ></script>
     <script src = "lib/PhysicsArrayRenderer.js"             ></script>
     <script src = "lib/CreateGeometries.js"                 ></script>
+    <script src = "lib/ObjectControls.js"                   ></script>
 
 
     <!-- AUDIO -->     
@@ -228,6 +229,7 @@
         time:    { type: "f"  , value : 0             },
         fingers: { type: "v3v" , value : []            },
         tips:    { type: "v3v" , value : []            },
+        vels:    { type: "v3v" , value : []            },
 
         // MOON
         lightPos: {type:"v3" , value: new THREE.Vector3() },
@@ -258,6 +260,8 @@
       G.v3 = new THREE.Vector3();
       G.v4 = new THREE.Vector3();
 
+      G.planeVel = new THREE.Vector3();
+
 
 
 
@@ -272,6 +276,7 @@
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
 
       G.t.sprite = THREE.ImageUtils.loadTexture('assets/img/sprites/flare.png');
+
 
 
 
@@ -311,7 +316,7 @@
 
 
       //Muting audio, so we don't have feedback
-      G.audio.mute.gain.value = 0;
+      //G.audio.mute.gain.value = 0;
 
 
 
@@ -329,10 +334,11 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 100 , w/h , .01 , 100 );
+        camera = new THREE.PerspectiveCamera( 60 , w/h , .01 , 100 );
         camera.position.z = 0.3;
         camera.position.y = 0.1;
         camera.lookAt( new THREE.Vector3() );
+
 
 
         scene = new THREE.Scene();
@@ -388,6 +394,11 @@
         for( var i = 0; i< G.fingers.tips.length; i++ ){
           G.uniforms.tips.value.push( G.fingers.tips[i] );
         }
+
+        for( var i = 0; i< G.fingers.tips.length; i++ ){
+          G.uniforms.vels.value.push( new THREE.Vector3() );
+        }
+
         console.log( G.uniforms.tips.value)
 
         leap.connect();
@@ -438,10 +449,29 @@
 
 
 
-        pulse.body.position.y = 7.5
+        //pulse.body.position.y = 7.5
         //pulse.body.position.y = -30
 
 
+
+        G.objectControls = new ObjectControls( camera );
+        G.intersectionPlane = new THREE.Mesh( 
+          new THREE.PlaneBufferGeometry( 40000 , 40000 ) ,
+          new THREE.MeshNormalMaterial()
+        );
+        G.intersectionPlane.rotation.x = -Math.PI / 2;
+        G.intersectionPlane.visible = false;
+        G.intersectionPlane.position.y = -.1;
+        scene.add(G.intersectionPlane);
+        G.objectControls.add( G.intersectionPlane )
+
+
+        G.intersectionMarker = new THREE.Mesh( 
+          new THREE.IcosahedronGeometry( .002 , 1 ),
+          new THREE.MeshNormalMaterial()
+        ); 
+
+        scene.add( G.intersectionMarker );
      
 
 
@@ -462,16 +492,70 @@
 
         if( f.valid ){ 
           G.fingers.update( f );
+          G.touchPlane.update(f.valid);
+          G.panPlane.update(f.valid);
+        }else{
+
+          G.objectControls.update();
+          var raycaster = G.objectControls.raycaster;
+          var i = raycaster.intersectObject( G.intersectionPlane );
+
+          if( !i[0] ){ 
+            console.log( 'something is terribly wrong' );
+          }else{
+            
+            G.uniforms.vels.value[1].copy( G.uniforms.tips.value[1] );
+            G.uniforms.tips.value[1].copy( i[0].point );
+            G.uniforms.vels.value[1].sub( G.uniforms.tips.value[1] );
+
+            G.intersectionMarker.position.copy( G.uniforms.tips.value[1] );
+
+
+            if(G.objectControls.selected == G.intersectionPlane ){
+              //console.log( 'YO')
+
+              G.v1.copy( G.uniforms.vels.value[1] );
+              var l = G.v1.length();
+              G.v1.normalize();
+              G.v1.multiplyScalar( l );
+              G.v1.multiplyScalar( -.4 )
+              G.planeVel.add( G.v1 );
+            }
+
+
+          }
+
+
+          G.panPlane.body.position.add( G.planeVel );
+
+
+          if( -G.panPlane.body.position.x > G.panPlane.maxX ){
+            G.panPlane.body.position.x = -G.panPlane.maxX;
+          }
+
+          if( -G.panPlane.body.position.x < -G.panPlane.maxX ){
+            G.panPlane.body.position.x = G.panPlane.maxX;
+          }
+
+          if( G.panPlane.body.position.z > G.panPlane.maxY ){
+            G.panPlane.body.position.z = G.panPlane.maxY;
+          }
+
+          if( G.panPlane.body.position.z < -G.panPlane.maxY ){
+            G.panPlane.body.position.z = -G.panPlane.maxY;
+          }
+          G.planeVel.multiplyScalar( .9 )
+
         }
 
-        G.touchPlane.update(f.valid);
-        G.panPlane.update(f.valid);
+
+
         
 
         TWEEN.update();
 
 
-        controls.update();
+       // controls.update();
         G.audio.update();
         
         pulse.update();

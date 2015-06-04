@@ -16,6 +16,10 @@ void main(){
     col = vNorm * .5 + .5;
   }
 
+  if( vLookAt > .5 ){
+    col = vNorm * .5 + .5;
+  }
+
 
   gl_FragColor =  vec4( col , 1. ) ;
 
