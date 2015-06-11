@@ -1,9 +1,12 @@
 
 uniform sampler2D t_monk;
+uniform sampler2D t_lock;
 varying float vDepth;
 varying float vLife;
 varying float vToggled;
 varying float vDist;
+varying float vLock;
+
 
 const int depth = @DEPTH;
 
@@ -36,6 +39,7 @@ void main(){
   }
 
   vToggled = texture2D( t_monk , vec2( position.x , 0. )).a;
+  vLock = texture2D( t_lock , vec2( position.x , 0. )).x;
 
   vLife = p.w;
 

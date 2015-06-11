@@ -57,6 +57,7 @@
     <script src = "audio/AudioBuffer.js"                    ></script>
     <script src = "audio/BufferedAudio.js"                  ></script>
     <script src = "audio/Stream.js"                         ></script>
+    <script src = "audio/Looper.js"                         ></script>
 
         
     <!-- PATHS -->
@@ -94,6 +95,7 @@
     <script src = "scene/MoonField.js"                      ></script>
     <script src = "scene/Mountains.js"                      ></script>
     <script src = "scene/AudioField.js"                     ></script>
+    <script src = "scene/MonkMusic.js"                      ></script>
     <script src = "scene/Pedestal.js"                       ></script>
 
     <!-- PULSE -->
@@ -285,6 +287,14 @@
       G.audio = new AudioController();
       G.uniforms.t_audio.value = G.audio.texture;
 
+      G.looper = new Looper({
+
+        beatsPerMinute: 122,
+        beatsPerMeasure: 4,
+        measuresPerLoop: 8
+        
+      });
+
 
       //var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
 
@@ -297,7 +307,16 @@
       //  "assets/audio/df/3.mp3",
       ];
 
+      var toLoadLoopArray = [
+        "assets/audio/credits/anime.mp3",
+        "assets/audio/credits/bass.mp3",
+        "assets/audio/credits/clap.mp3",
+        "assets/audio/credits/kick.mp3",
+        "assets/audio/credits/vox.mp3"
+      ];
+
       G.audioBuffers = [];
+      G.loopBuffers  = [];
 
       for( var i = 0; i < toLoadAudioArray.length; i++ ){
 
@@ -313,6 +332,22 @@
         G.audioBuffers.push( audioBuffer )
 
       }
+
+      for( var i = 0; i < toLoadLoopArray.length; i++ ){
+
+        var audioBuffer = new AudioBuffer( G.audio.ctx , toLoadLoopArray[i] );
+
+        addLoad();
+
+        audioBuffer.addLoadEvent( function(){
+          console.log( 'yup')
+          onLoad();
+        });
+
+        G.loopBuffers.push( audioBuffer )
+
+      }
+
 
 
       //Muting audio, so we don't have feedback
@@ -335,8 +370,13 @@
         var h = window.innerHeight;
 
         camera = new THREE.PerspectiveCamera( 60 , w/h , .01 , 100 );
-        camera.position.z = 0.3;
-        camera.position.y = 0.1;
+        camera.position.z = 1.5;
+        if( VR  == false ){
+          camera.position.y = 0.5;
+        }else{
+          camera.position.y = .1;  
+        }
+
         camera.lookAt( new THREE.Vector3() );
 
 
@@ -474,6 +514,7 @@
         scene.add( G.intersectionMarker );
      
 
+        G.looper.start();
 
 
       }
@@ -484,6 +525,8 @@
 
         stats.update();
         requestAnimationFrame( animate );
+
+        G.looper._update();
        
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;

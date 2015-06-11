@@ -1,10 +1,12 @@
-function MoonField(puppyPos){
+function MoonField( puppyPos ){
   
+
+  this.music = new MonkMusic( G.loopBuffers );
   this.body = new THREE.Object3D();
 
   this.lookPos = new THREE.Vector3();
 
-  this.depth = 32;
+  this.depth = 16;
   this.joints = 8;
   this.jointSize = this.depth / this.joints;
   this.size = 64;
@@ -16,9 +18,18 @@ function MoonField(puppyPos){
 
   this.t_monk = { type:"t" , value: null }
   this.t_oMonk = { type:"t" , value: null }
+  this.t_lock = { type:"t" , value: null }
   this.monks = this.createMonks();
   this.t_monk.value= this.monks.texture;
   this.t_oMonk.value= this.monks.oTexture;
+  this.t_lock.value= this.monks.lockTexture;
+
+  this.toggled = [];
+  this.locked  = [];
+  for( var i = 0; i < this.size; i++ ){ 
+    this.toggled.push( false ); 
+    this.locked.push( false ); 
+  }
 
   this.ringRadius = { type:"f" , value: .005 }
 
@@ -39,6 +50,7 @@ function MoonField(puppyPos){
   
   this.resetSoul();
 
+
   for( var i = 0; i < this.joints; i++ ){
 
     this.jointArray.push( this.soul.rt[i] );
@@ -53,6 +65,7 @@ function MoonField(puppyPos){
       t_sprite: { type:"t" , value: G.t.sprite },
       t_posArray: { type:"tv" , value: this.jointArray },
       t_monk: this.t_monk,
+      t_lock: this.t_lock,
       t_audio: G.uniforms.t_audio,
       rainbow: G.uniforms.rainbow
     },
@@ -77,6 +90,7 @@ function MoonField(puppyPos){
       t_sprite: { type:"t" , value: G.t.sprite },
       t_posArray: { type:"tv" , value: this.jointArray },
       t_monk: this.t_monk,
+      t_lock: this.t_lock,
       t_audio: G.uniforms.t_audio,
       rainbow: G.uniforms.rainbow
     },
@@ -249,6 +263,12 @@ MoonField.prototype.updateMonkPositions = function(){
         this.monks.positions[ i ].y = this.monks.data[ i * 4 + 1 ];
         this.monks.positions[ i ].z = this.monks.data[ i * 4 + 2 ];
         
+      }else{
+
+        if( this.locked[i] == false ){
+          this.lockMonk( i );
+        }
+
       }
 
     }
@@ -265,7 +285,13 @@ MoonField.prototype.toggleAllMonks = function(){
 
   for( var i = 0; i < this.monks.positions.length; i++ ){
 
-    this.toggleMonk( i );
+    var id = i;
+
+    var index = id * 4;
+    var value = this.monks.texture.image.data[ index + 3 ] ;
+
+    var val = 0;// Math.abs( value - 1 );
+    this.monks.data[ index + 3 ] = val;
   }
 
 }
@@ -273,20 +299,38 @@ MoonField.prototype.toggleAllMonks = function(){
 
 MoonField.prototype.toggleMonk = function(id){
 
+  if( this.toggled[id] == false ){
+    this.toggled[id] = true;
+
+    var index = id * 4;
+    var value = this.monks.texture.image.data[ index + 3 ] ;
+
+    var val = 1;// Math.abs( value - 1 );
+    this.monks.data[ index + 3 ] = val;
+
+
+    var randID = Math.floor( Math.random() * this.music.filters.length);
+    this.music.filters[randID].frequency.value += 200
+
+    /*if( val == 1 ){
+      this.resetSingleMonk( id );
+    }*/
+
+
+    this.monks.texture.needsUpdate = true;
+  }
+
+
+}
+
+MoonField.prototype.lockMonk = function(id){
+
+  this.locked[id] = true;
+
   var index = id * 4;
-  var value = this.monks.texture.image.data[ index + 3 ] ;
-
-  var val = Math.abs( value - 1 );
-  this.monks.data[ index + 3 ] = val;
-
-  /*if( val == 1 ){
-    this.resetSingleMonk( id );
-  }*/
-
-
-  this.monks.texture.needsUpdate = true;
-
-
+  this.monks.lockData[ index ] = 1;
+  this.monks.lockTexture.needsUpdate = true;
+  console.log( 'LOCKES : ' + id )
 }
 
 MoonField.prototype.createMonks = function(){
@@ -294,6 +338,7 @@ MoonField.prototype.createMonks = function(){
   var data    = new Float32Array( this.size * 4 );
   var oData   = new Float32Array( this.size * 4 );
   var target  = new Float32Array( this.size * 4 );
+  var lockData  = new Float32Array( this.size * 4 );
 
 
 
@@ -306,6 +351,7 @@ MoonField.prototype.createMonks = function(){
   monks.markers = [];
   monks.data = data;
   monks.oData = oData;
+  monks.lockData = lockData;
   monks.target = target;
   monks.distancesToFinger = [];
 
@@ -348,6 +394,13 @@ MoonField.prototype.createMonks = function(){
     oData[ i * 4 + 1 ] = 0;
     oData[ i * 4 + 2 ] = z;
     oData[ i * 4 + 3 ] = a;
+
+
+    lockData[ i * 4 + 0 ] = 0;
+    lockData[ i * 4 + 1 ] = 0;
+    lockData[ i * 4 + 2 ] = 0;
+    lockData[ i * 4 + 3 ] = 0;
+
 
 
     var position =new THREE.Vector3( x , y , z )
@@ -405,6 +458,20 @@ MoonField.prototype.createMonks = function(){
   oTexture.needsUpdate = true;
 
   monks.oTexture = oTexture;
+
+  var lockTexture = new THREE.DataTexture( 
+    oData,
+    this.size,
+    1,
+    THREE.RGBAFormat,
+    THREE.FloatType
+  );
+
+
+  lockTexture.needsUpdate = true;
+
+  monks.lockTexture = lockTexture;
+
 
 
   monks.body = this.createMonkBody();

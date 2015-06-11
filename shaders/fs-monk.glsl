@@ -4,6 +4,7 @@ varying float vID;
 varying float vLookAt;
 varying vec3 vNorm;
 varying vec2 vUv;
+varying float vLife;
 
 $getRainbow
 
@@ -18,6 +19,10 @@ void main(){
 
   if( vLookAt > .5 ){
     col = vNorm * .5 + .5;
+  }
+
+  if( vLife > .5 ){
+  	col = vNorm * .5 + .5;
   }
 
 

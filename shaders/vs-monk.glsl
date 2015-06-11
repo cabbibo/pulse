@@ -12,6 +12,7 @@ varying float vID;
 varying float vLookAt;
 varying vec3 vNorm;
 varying vec2 vUv;
+varying float vLife;
 
 
 void main(){
@@ -25,6 +26,7 @@ void main(){
 
   vec3 pos = monkPos.xyz;
 
+  vLife = monkPos.w;
   vID = id;
   vLookAt = lookAt;
   vUv = uv;
