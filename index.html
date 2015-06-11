@@ -107,7 +107,7 @@
 
       var camera, renderer, scene , controls , clock;
 
-      var VR = false;
+      var VR = true;
       var effect;
   
 
@@ -370,7 +370,7 @@
         G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
 
-        G.panPlane.forceMultiplier = 200;
+        G.panPlane.forceMultiplier = 30;
 
         G.panPlane.maxX = 15;
         G.panPlane.maxY = 33;
