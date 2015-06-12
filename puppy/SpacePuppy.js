@@ -40,7 +40,9 @@ function SpacePuppy( size ,  fingers , zPos ){
   this.interface.body.position.z = .9;
   this.interface.body.rotation.x = -.5;
   this.interface.body.position.y = -this.puppyY / 2;
-  this.body.add( this.interface.body )
+ 
+  if( VR == true )
+    this.body.add( this.interface.body )
 
 
 

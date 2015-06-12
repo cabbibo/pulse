@@ -10,7 +10,7 @@ function AudioField( body , buffers , positions , looping ){
 
   this.markers = [];
 
-  for( var i = 0; i < buffers.length; i++ ){
+  for( var i = 0; i < this.buffers.length; i++ ){
 
     var m = new THREE.Mesh( geo , mat );
     m.position.copy( positions[i] );
@@ -24,12 +24,20 @@ function AudioField( body , buffers , positions , looping ){
 
     g.connect( G.audio.gain );
 
-    var source = new BufferedAudio( buffers[i].buffer , G.audio.ctx , g , looping );
+    var source = new BufferedAudio( buffers[i].buffer , G.audio.ctx , g , false );
     this.sources.push( source )
 
   }
 
   this.add();
+
+  G.looper.everyLoop( function(){
+
+    for( var i = 0; i < this.sources.length; i++ ){
+      this.sources[i].play();
+    }
+
+  }.bind( this ));
 
 }
 
@@ -37,7 +45,7 @@ AudioField.prototype.add = function(){
 
   for( var i = 0; i < this.buffers.length; i++ ){
     this.body.add( this.markers[i] );
-    this.sources[i].play();
+    //this.sources[i].play();
   }
 
 }

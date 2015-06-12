@@ -7,6 +7,7 @@ varying float vDepth;
 varying float vLife;
 varying float vToggled;
 varying float vDist;
+varying float vLock;
 
 $getRainbow
 
@@ -27,7 +28,7 @@ void main(){
   vec4 col = a * 4. * clamp( vDist * 3. , 0. , 1. ) * clamp( vLife * 40. , 0. , 1.  ) * (1. - vDepth);
 
   float vRainbow = getRainbow();
-  if( vRainbow < rainbow ){
+  if( vRainbow < rainbow  || vLock > .5 ){
     col += a * vec4( normalize( vVel ) * .5 + .5 , 1. );
   }
   //gl_FragColor = vec4( 1.,.3,0.,1. )* vDepth + vec4( 0. , .3 , 1. , 1. ) * ( 1. - vDepth );
