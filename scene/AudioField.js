@@ -27,7 +27,12 @@ function AudioField( body , buffers , positions , looping ){
 
     var filter = G.audio.ctx.createBiquadFilter();
     filter.type = 'hipass';
-    filter.frequency.value = 40;
+
+    if( i == 0 ){
+      filter.frequency.value = 40;
+    }else{
+      filter.frequency.value = 4000;
+    }
 
     g.connect( filter );
     filter.connect( G.audio.gain );
