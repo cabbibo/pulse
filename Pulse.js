@@ -144,8 +144,14 @@ Pulse.prototype.addCity = function( fingers ){
   ] , body , .006 );
 
 
-  button.toggle = function(){ this.moonField.start(); }.bind( this );
-  button.unToggle = function(){ this.moonField.stop(); }.bind( this );
+  button.toggle = function(){ 
+    this.audioField.filters[0].frequency.value = 4000;
+    this.moonField.start(); 
+  }.bind( this );
+  button.unToggle = function(){ 
+    this.moonField.stop(); 
+    this.audioField.filters[0].frequency.value = 40;
+  }.bind( this );
 
   var string = 'cityButton'
   var u = G.uniforms[ string ];

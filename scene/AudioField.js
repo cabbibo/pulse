@@ -3,6 +3,7 @@ function AudioField( body , buffers , positions , looping ){
   this.body = body;
   this.buffers = buffers;
   this.gainNodes = [];
+  this.filters = [];
   this.sources = [];
 
   var geo = new THREE.IcosahedronGeometry( .01 , 1);
@@ -22,7 +23,16 @@ function AudioField( body , buffers , positions , looping ){
 
     this.gainNodes.push( g )
 
-    g.connect( G.audio.gain );
+    
+
+    var filter = G.audio.ctx.createBiquadFilter();
+    filter.type = 'hipass';
+    filter.frequency.value = 40;
+
+    g.connect( filter );
+    filter.connect( G.audio.gain );
+
+    this.filters.push( filter );
 
     var source = new BufferedAudio( buffers[i].buffer , G.audio.ctx , g , false );
     this.sources.push( source )

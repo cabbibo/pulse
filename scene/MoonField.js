@@ -9,7 +9,7 @@ function MoonField( puppyPos ){
   this.depth = 16;
   this.joints = 8;
   this.jointSize = this.depth / this.joints;
-  this.size = 64;
+  this.size = 8;
   var ss = shaders.ss.moonBeams;
 
   this.puppyPos = puppyPos;
@@ -26,6 +26,9 @@ function MoonField( puppyPos ){
 
   this.toggled = [];
   this.locked  = [];
+  this.toggledNum = 0;
+  this.lockedNum = 0;
+
   for( var i = 0; i < this.size; i++ ){ 
     this.toggled.push( false ); 
     this.locked.push( false ); 
@@ -334,6 +337,13 @@ MoonField.prototype.toggleMonk = function(id){
 
 
     this.monks.texture.needsUpdate = true;
+
+    this.toggledNum ++;
+
+    console.log( 'tN : ' +this.toggledNum )
+    if( this.toggledNum == this.size ){
+      this.allToggled();
+    }
   }
 
 
@@ -347,6 +357,19 @@ MoonField.prototype.lockMonk = function(id){
   this.monks.lockData[ index ] = 1;
   this.monks.lockTexture.needsUpdate = true;
   console.log( 'LOCKES : ' + id )
+  this.lockedNum ++;
+
+  if( this.lockedNum == this.size ){
+    this.allLocked();
+  }
+}
+
+MoonField.prototype.allToggled = function(){
+  pulse.pedestal.prepare();
+}
+
+MoonField.prototype.allLocked = function(){
+
 }
 
 MoonField.prototype.createMonks = function(){
