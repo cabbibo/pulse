@@ -58,6 +58,13 @@ function ToggleButton( size , touchers , body , bufferDistance ){
   this.touchPlane.addFirstHoverDownEvent( function( e ){ this._hoverDown( e ); }.bind( this ));
   this.touchPlane.addLastHoverUpEvent( function( e ){ this._hoverUp( e ); }.bind( this ));
 
+  this.topPlane.hoverOver = function(){ this.hovering = true; this._hoverDown(); }.bind( this );
+  this.topPlane.hoverOut = function(){  this.hovering = false; this._hoverUp(); }.bind( this );
+  this.topPlane.select = function(){ this.isTouched = true; }.bind( this );
+  this.topPlane.deselect = function(){ this.isTouched = false; }.bind( this );
+
+
+  G.objectControls.add( this.topPlane );
 
 }
 
@@ -68,6 +75,33 @@ ToggleButton.prototype.update = function(){
   for( var i = 0; i < this.linkedUniforms.length; i++ ){
     var u = this.linkedUniforms[i];
     u.value = ( this.toggled == false ) ? 0 : 1
+  }
+
+  if( this.hovering == true ){
+
+    var raycaster = G.objectControls.raycaster;
+    var i = raycaster.intersectObject( this.topPlane );
+    
+    if( i[0]){
+
+      G.v1.copy( i[0].point );
+      G.v2.copy( this.touchPlane.normal );
+
+      if( this.isTouched == true ){
+        G.v2.multiplyScalar( this.touchPlane.bufferDistance * - 1.2 );
+      }else{
+        G.v2.multiplyScalar( this.touchPlane.bufferDistance * - .5 );
+      }
+      G.v1.add( G.v2 )
+
+      G.uniforms.vels.value[1].copy( G.uniforms.tips.value[1] );
+      G.uniforms.tips.value[1].copy( G.v1 );
+      G.uniforms.vels.value[1].sub( G.uniforms.tips.value[1] );
+
+      G.intersectionMarker.position.copy( G.v1 );
+
+    }
+
   }
 
 

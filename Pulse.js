@@ -33,8 +33,15 @@ function Pulse(){
 
   this.sky = new THREE.Mesh(
     new THREE.IcosahedronGeometry( 60 , 2 ),
-    new THREE.MeshNormalMaterial({side: THREE.BackSide})
+    new THREE.ShaderMaterial({
+      vertexShader: shaders.vs.sky,
+      fragmentShader: shaders.fs.sky,
+      uniforms: G.uniforms,
+      side: THREE.BackSide
+    })
   );
+
+  this.body.add( this.sky );
 
   this.cliff = new Cliff();
   this.body.add( this.cliff );
@@ -111,6 +118,9 @@ Pulse.prototype.update = function(){
   this.moon.update();
   this.moonField.update();
   this.audioField.update();
+  this.pedestal.update();
+
+  this.cityButton.update();
 
   G.uniforms.lightPos.value.copy( this.moon.globalPos );
   G.light.position.copy( this.moon.globalPos );
@@ -120,7 +130,29 @@ Pulse.prototype.update = function(){
 
 }
 
-Pulse.prototype.addCity = function(){
+Pulse.prototype.addCity = function( fingers ){
+
+  var body = new THREE.Object3D();
+  body.position.y =  .04
+  body.position.x =  .0
+  body.rotation.x = -Math.PI / 2;
+
+
+  var button = new ToggleButton( .3 , [
+    G.fingers.tips[1],
+    G.fingers.tips[6],
+  ] , body , .006 );
+
+
+  button.toggle = function(){ this.moonField.start(); }.bind( this );
+  button.unToggle = function(){ this.moonField.stop(); }.bind( this );
+
+  var string = 'cityButton'
+  var u = G.uniforms[ string ];
+  button.linkUniform( u );
+
+  this.body.add( button.body );
+  this.cityButton = button; 
 
   this.body.add( this.city.buildings );
   this.body.add( this.city.wire );
@@ -140,6 +172,7 @@ Pulse.prototype.addPuppy = function(){
 
 Pulse.prototype.enlighten = function(){
  
+
   var s ={ 
     v: 0
   }
@@ -153,7 +186,29 @@ Pulse.prototype.enlighten = function(){
       })
       .onComplete(function(e){
         console.log('YAAA')
-        self.body.add( self.sky );
+        //self.body.add( self.sky );
+      })
+      .start();
+
+
+}
+
+Pulse.prototype.unenlighten = function(){
+ 
+  var s ={ 
+    v: 1
+  }
+  var e ={ v: 0 }
+  var self = this;
+  new TWEEN.Tween( s )
+      .to( e , 2000. )
+      .easing( TWEEN.Easing.Exponential.Out )
+      .onUpdate(function(e){ 
+        G.uniforms.rainbow.value = this.v;
+      })
+      .onComplete(function(e){
+        console.log('YAAA')
+        //self.body.remove( self.sky );
       })
       .start();
 

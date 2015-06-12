@@ -8,6 +8,7 @@ function SpacePuppy( size ,  fingers , zPos ){
   this.puppyZ = -zPos;
 
   this.lifeOn = { type:"f" , value: 1 }
+  this.lifeLinesOn = true;
 
 
   this.size = size;
@@ -34,7 +35,7 @@ function SpacePuppy( size ,  fingers , zPos ){
   this.interface = new Interface([
     this.fingers[1],
     this.fingers[6],
-  ])
+  ], this );
 
   this.interface.body.position.z = .9;
   this.interface.body.rotation.x = -.5;
@@ -83,6 +84,14 @@ function SpacePuppy( size ,  fingers , zPos ){
     t_normal     : { type:"t"    , value: G.t.normal       },
     t_audio	     : { type:"t"    , value: G.audio.texture  },
     fingers      : { type:"v3"   , value: fingers          },
+
+
+    toggle1      : G.uniforms.toggle1,
+    toggle2      : G.uniforms.toggle2,
+    toggle3      : G.uniforms.toggle3,
+    toggle4      : G.uniforms.toggle4,
+    toggle5      : G.uniforms.toggle5,
+    toggle6      : G.uniforms.toggle6,
 
     repelers	   : { type:"v4v"  , value: this.repelers    },
 
@@ -199,6 +208,8 @@ function SpacePuppy( size ,  fingers , zPos ){
 
   }
 
+  this.turnOffLifelines();
+
 	
 }
 
@@ -209,6 +220,7 @@ SpacePuppy.prototype.turnOffLifelines = function(){
   //this.lifeOn.value = 0;
 
  
+ this.lifeLinesOn = false;
   var s ={ 
     v: this.lifeOn.value ,
     uniform: this.lifeOn
@@ -228,7 +240,7 @@ SpacePuppy.prototype.turnOnLifelines = function(){
 
   //this.lifeOn.value = 0;
 
- 
+  this.lifeLinesOn = true;
   var s ={ 
     v: this.lifeOn.value ,
     uniform: this.lifeOn
@@ -242,6 +254,14 @@ SpacePuppy.prototype.turnOnLifelines = function(){
       })
       .start();
 
+}
+
+SpacePuppy.prototype.toggleLifelines = function(){
+  if( this.lifeLinesOn == true  ){
+    this.turnOffLifelines();
+  }else{
+    this.turnOnLifelines();
+  }
 }
 
 

@@ -4,6 +4,12 @@ uniform sampler2D t_audio;
 uniform sampler2D t_matcap;
 uniform float time;
 uniform float rainbow;
+uniform float toggle1;
+uniform float toggle2;
+uniform float toggle3;
+uniform float toggle4;
+uniform float toggle5;
+uniform float toggle6;
 
 uniform vec3 color2;
 uniform vec3 color1;
@@ -43,7 +49,7 @@ $getRainbow
 void main(){
 
  
-	vec3 fNorm = uvNormalMap( t_normal , vPos , vUv  , vMNorm , 1.1 , 1.1 );
+	vec3 fNorm = uvNormalMap( t_normal , vPos , vUv  , vMNorm , 1.1 * toggle2 , 1.1 + toggle3 * 10. );
 
     //fNorm =  texture2D( t_normal , vUv ).xyz;//vec3( 1. );
    

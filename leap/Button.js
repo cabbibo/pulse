@@ -84,6 +84,7 @@ Button.prototype._touchUp = function( e ){
 }
 Button.prototype._hoverDown = function( e ){
 
+  console.log( 'HELO' );
   this.hovering = true;
   this.title.material.opacity = 1.;
   this.hoverDown( e );

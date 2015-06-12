@@ -22,7 +22,7 @@ function MoonField(puppyPos){
 
   this.ringRadius = { type:"f" , value: .005 }
 
-  this.body.add( this.monks.body );
+ 
 
   for( var i = 0; i< this.monks.markers.length; i++ ){
     this.body.add( this.monks.markers[i] );
@@ -66,7 +66,6 @@ function MoonField(puppyPos){
 
   this.particles = new THREE.PointCloud( this.particleGeo , this.particleMat );
   this.particles.frustumCulled = false;
-  this.body.add( this.particles )
 
 
   this.lineGeo = createLineGeometry( this.size , this.joints );
@@ -90,27 +89,44 @@ function MoonField(puppyPos){
 
   this.lines = new THREE.Line( this.lineGeo , this.lineMat , THREE.LinePieces );
   this.lines.frustumCulled = false;
-  this.body.add( this.lines );
-
 
   this.toggleAllMonks();
 
 
 }
 
+
+MoonField.prototype.start = function(){
+  this.started = true;
+  this.body.add( this.monks.body );
+  this.body.add( this.lines );
+  this.body.add( this.particles );
+}
+
+MoonField.prototype.stop = function(){
+  this.started = false;
+  this.body.remove( this.monks.body );
+  this.body.remove( this.lines );
+  this.body.remove( this.particles );
+}
 MoonField.prototype.update = function(){
 
-  this.soul.update();
+ 
+    this.soul.update();
 
-  // Makes sure the joints of the ribbons 
-  // are properly dun
-  for( var i =0; i< this.joints; i++ ){
-    this.jointArray[i] = this.soul.output[i * this.jointSize];
+    // Makes sure the joints of the ribbons 
+    // are properly dun
+    for( var i =0; i< this.joints; i++ ){
+      this.jointArray[i] = this.soul.output[i * this.jointSize];
+    }
+
+  if( this.started == true ){
+
+    this.updateMonkPositions();
+
+    this.checkMonks([ G.fingers.tips[1] ]);
+
   }
-
-  this.updateMonkPositions();
-
-  this.checkMonks([ G.fingers.tips[1] ]);
 
 }
 

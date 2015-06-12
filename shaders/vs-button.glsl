@@ -38,6 +38,8 @@ float getDisplacement( vec3 n , vec3 pos ){
 		vec3 perp = vec3(0.);
 
 		float d = distanceToPlane( n , pos , touch , perp , para );
+
+    if( d < -bufferDistance * 2. ){ d = 0.; }
     //dist = d;
     dist = min( dist , d );
 

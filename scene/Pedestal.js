@@ -4,7 +4,48 @@ function Pedestal(){
   var mat = new THREE.MeshNormalMaterial();
 
   this.body = new THREE.Mesh( geo , mat );
-  
+
+ 
+}
+
+Pedestal.prototype.prepare = function(){
+
+  this.prepared = true;
+
+
+  var body = new THREE.Object3D();
+  body.position.y =  .04
+  body.position.x =  .0
+  body.rotation.x = -Math.PI / 2;
+
+  var button = new ToggleButton( .1 , [
+    G.fingers.tips[1],
+    G.fingers.tips[6],
+  ] , body , .006 );
+
+
+  button.toggle = function(){ 
+    pulse.enlighten();
+  }.bind( this );
+
+  button.unToggle = function(){ 
+    pulse.unenlighten(); 
+  }.bind( this );
+
+  var string = 'cityButton'
+  var u = G.uniforms[ string ];
+  button.linkUniform( u );
+  this.button = button; 
+  this.body.add( this.button.body );
+
+}
+
+Pedestal.prototype.update = function(){
+
+  if( this.button ){
+    this.button.update();
+  }
+
 }
 
 Pedestal.prototype.createGeometry = function(){

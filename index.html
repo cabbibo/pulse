@@ -2,13 +2,18 @@
 
   <head>
     <style>
-      body{ margin: 0px; }
+      body{ margin: 0px; font-family:  "GeoSans" }
       html{ overflow: hidden }
       #stats{ 
         position: absolute;
         bottom: 0px;
         left:0px;
         z-index: 999;
+      }
+
+      @font-face {
+        font-family: "GeoSans";
+        src: url("../assets/GeosansLight.ttf");
       }
     </style>
   </head>
@@ -19,8 +24,17 @@
 
     TODO:
 
-        lifeLines Shader
-        topPlane Shader should match theme
+        backPlane of toggleButtons doesn't match theme
+        battery doesn't match theme
+        pipeline doesn't match theme.
+          - Pipeline should reverse direction of flow when all monks
+            are turned on.
+
+
+
+        Long Shot:
+          hover over on interface should have text info for what interface does
+          enlighten should have a fade for all shaders, not just sky ( use mix! )
 
 
     -->
@@ -208,6 +222,9 @@
       shaders.load( 'vs-water' , 'water' , 'vertex'     );
       shaders.load( 'fs-water' , 'water' , 'fragment'   );
 
+      shaders.load( 'vs-sky' , 'sky' , 'vertex'     );
+      shaders.load( 'fs-sky' , 'sky' , 'fragment'   );
+
 
 
       /*
@@ -247,6 +264,9 @@
         toggle5 : { type: "f" , value: 0 },
         toggle6 : { type: "f" , value: 0 },
 
+
+        cityButton : { type: "f" , value: 0 },
+
         rainbow : { type: "f" , value: 0 },
 
       }
@@ -276,6 +296,16 @@
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
 
       G.t.sprite = THREE.ImageUtils.loadTexture('assets/img/sprites/flare.png');
+
+
+      // Game state
+      G.cityOn    = false;
+      G.monksOn   = false;
+      G.rainbowOn = false;
+
+
+
+
 
 
 
@@ -316,7 +346,7 @@
 
 
       //Muting audio, so we don't have feedback
-      //G.audio.mute.gain.value = 0;
+      G.audio.mute.gain.value = 0;
 
 
 
@@ -335,8 +365,8 @@
         var h = window.innerHeight;
 
         camera = new THREE.PerspectiveCamera( 60 , w/h , .01 , 100 );
-        camera.position.z = 0.3;
-        camera.position.y = 0.1;
+        camera.position.z = 0.5;
+        camera.position.y = 0.2;
         camera.lookAt( new THREE.Vector3() );
 
 
@@ -355,11 +385,17 @@
         document.body.appendChild( stats.domElement );
 
 
+
+
         window.addEventListener( 'resize', onWindowResize, false );
         if( VR == true ){
           window.addEventListener('dblclick', onDoubleClick , false );
         }
-        textCreator =  new TextCreator( 100 );
+
+        clock = new THREE.Clock();
+        G.objectControls = new ObjectControls( camera );
+        
+        G.textCreator =  new TextCreator( 100 );
 
         if( VR == true ){
 
@@ -370,7 +406,7 @@
           renderer.setSize( window.innerWidth, window.innerHeight );
         }
 
-        clock = new THREE.Clock();
+        
 
         if( VR == true ){
           controls = new THREE.VRControls( camera );
@@ -450,11 +486,11 @@
 
 
         //pulse.body.position.y = 7.5
-        //pulse.body.position.y = -30
+        pulse.body.position.y = -29.5
 
 
 
-        G.objectControls = new ObjectControls( camera );
+
         G.intersectionPlane = new THREE.Mesh( 
           new THREE.PlaneBufferGeometry( 40000 , 40000 ) ,
           new THREE.MeshNormalMaterial()
@@ -463,7 +499,7 @@
         G.intersectionPlane.visible = false;
         G.intersectionPlane.position.y = -.1;
         scene.add(G.intersectionPlane);
-        G.objectControls.add( G.intersectionPlane )
+        //G.objectControls.add( G.intersectionPlane )
 
 
         G.intersectionMarker = new THREE.Mesh( 
@@ -491,37 +527,60 @@
         var f = leap.frame();
 
         if( f.valid ){ 
+
           G.fingers.update( f );
           G.touchPlane.update(f.valid);
           G.panPlane.update(f.valid);
+
         }else{
 
+          G.oHovered = G.objectControls.objectHovered;
+
           G.objectControls.update();
-          var raycaster = G.objectControls.raycaster;
-          var i = raycaster.intersectObject( G.intersectionPlane );
 
-          if( !i[0] ){ 
-            console.log( 'something is terribly wrong' );
-          }else{
-            
-            G.uniforms.vels.value[1].copy( G.uniforms.tips.value[1] );
-            G.uniforms.tips.value[1].copy( i[0].point );
-            G.uniforms.vels.value[1].sub( G.uniforms.tips.value[1] );
+          if( G.objectControls.objectHovered == false ){
 
-            G.intersectionMarker.position.copy( G.uniforms.tips.value[1] );
+            var raycaster = G.objectControls.raycaster;
+            var i = raycaster.intersectObject( G.intersectionPlane );
+
+            if( !i[0] ){ 
+              //console.log( 'something is terribly wrong' );
+            }else{
+
+              
 
 
-            if(G.objectControls.selected == G.intersectionPlane ){
-              //console.log( 'YO')
+              
+              //console.log( 'ss')
+              G.uniforms.vels.value[1].copy( G.uniforms.tips.value[1] );
+              G.uniforms.tips.value[1].copy( i[0].point );
+              G.uniforms.vels.value[1].sub( G.uniforms.tips.value[1] );
 
-              G.v1.copy( G.uniforms.vels.value[1] );
-              var l = G.v1.length();
-              G.v1.normalize();
-              G.v1.multiplyScalar( l );
-              G.v1.multiplyScalar( -.4 )
-              G.planeVel.add( G.v1 );
+              G.intersectionMarker.position.copy( G.uniforms.tips.value[1] );
+
+
+              if( G.objectControls.mouseDepressed ==  true && G.oHovered == false ){
+
+                G.v1.copy( G.uniforms.vels.value[1] );
+                var l = G.v1.length();
+                G.v1.normalize();
+                G.v1.multiplyScalar( l );
+                G.v1.multiplyScalar( -.4 )
+                G.planeVel.add( G.v1 );
+
+              }
+              /*if( G.objectControls.selected == G.intersectionPlane ){
+                //console.log( 'YO')
+
+                G.v1.copy( G.uniforms.vels.value[1] );
+                var l = G.v1.length();
+                G.v1.normalize();
+                G.v1.multiplyScalar( l );
+                G.v1.multiplyScalar( -.4 )
+                G.planeVel.add( G.v1 );
+
+              }*/
             }
-
 
           }
 

@@ -5,7 +5,7 @@ function AudioField( body , buffers , positions , looping ){
   this.gainNodes = [];
   this.sources = [];
 
-  var geo = new THREE.IcosahedronGeometry( .1 , 1);
+  var geo = new THREE.IcosahedronGeometry( .01 , 1);
   var mat = new THREE.MeshNormalMaterial();
 
   this.markers = [];

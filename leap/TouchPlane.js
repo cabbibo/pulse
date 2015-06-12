@@ -39,13 +39,14 @@ function TouchPlane( touchers , body , xy , bufferDistance ){
 
   for( var i = 0; i < this.touchers.length; i++ ){
 
-    this.touchPoints.push( this.touchers[i].clone() );
+    this.touchPoints.push(  this.touchers[i].clone() );
     this.oTouchPoints.push( this.touchers[i].clone() );
+
     this.touchInfo.push({
       hovered: false,
       touching: false,
       touchStartTime: 0
-    })
+    });
 
   }
 	
@@ -61,8 +62,8 @@ function TouchPlane( touchers , body , xy , bufferDistance ){
   this.basePoint = new THREE.Vector3( 0 , 0 , -this.bufferDistance );
 
   this.normal = new THREE.Vector3( 0 , 0 , 1 );
-  this.xVec = new THREE.Vector3( 1 , 0 , 0 );
-  this.yVec = new THREE.Vector3( 0 , 1 , 0 );
+  this.xVec   = new THREE.Vector3( 1 , 0 , 0 );
+  this.yVec   = new THREE.Vector3( 0 , 1 , 0 );
 
   this.v1 = new THREE.Vector3();
   this.v2 = new THREE.Vector3();
@@ -98,6 +99,7 @@ TouchPlane.prototype.update = function(){
   this.yVec.sub( this.v1 );
 
 
+
   for( var  i = 0; i < this.touchers.length; i++ ){
 
     this.oTouchPoints[i].copy( this.touchPoints[i] );
@@ -124,29 +126,33 @@ TouchPlane.prototype.update = function(){
         this._hovering( this.touchPoints[i] , i , d , dD )
       }
 
-      if( oD > 0 && d <= 0 ){
-        var XY = this.getXY( this.touchPoints[i] )
-        this._touchDown( this.touchPoints[i] , XY , i )
-      }
+      // Make sure we dont care about super deep poks
+      if( d > -this.bufferDistance * 2 && d > -this.bufferDistance * 2 ){
+        if( oD > 0 && d <= 0 ){
+          console.log( this.touchPoints[i] )
+          var XY = this.getXY( this.touchPoints[i] )
+          this._touchDown( this.touchPoints[i] , XY , i )
+        }
 
-      if( oD < 0 && d >= 0 ){
-        this._touchUp( this.touchPoints[i] , i )
-      }
+        if( oD < 0 && d >= 0 ){
+          this._touchUp( this.touchPoints[i] , i )
+        }
 
-      if( oD < 0  && d < 0 ){
+        if( oD < 0  && d < 0 ){
 
-        this.v3.copy( this.touchPoints[i] );
-        this.v3.sub( this.oTouchPoints[i] );
+          this.v3.copy( this.touchPoints[i] );
+          this.v3.sub( this.oTouchPoints[i] );
 
 
-        var dXY = this.getXY( this.v3 );
+          var dXY = this.getXY( this.v3 );
 
-        this.v3.copy( this.touchPoints[i] );
-        this.v3.sub( this.basePoint );
-        var XY = this.getXY( this.v3 )
+          this.v3.copy( this.touchPoints[i] );
+          this.v3.sub( this.basePoint );
+          var XY = this.getXY( this.v3 )
 
-        this._touching( this.touchPoints[i] , i , this.v3 , XY , dXY , dD );
+          this._touching( this.touchPoints[i] , i , this.v3 , XY , dXY , dD );
 
+        }
       }
 
     // Make sure that if we are out of bounds
