@@ -4,54 +4,182 @@
     <style>
       body{ margin: 0px; }
       html{ overflow: hidden }
+      #stats{ 
+        position: absolute;
+        bottom: 0px;
+        left:0px;
+        z-index: 999;
+      }
     </style>
   </head>
 
   <body>
 
-    <script src = "lib/three.min.js"                ></script>
-    <script src = "lib/jquery.min.js"               ></script>
-    <script src = "lib/ShaderLoader.js"             ></script>
-    <script src = "lib/VREffect.js"             ></script>
-    <script src = "lib/VRControls.js"             ></script>
-    <script src = "lib/ShaderLoader.js"             ></script>
+    <!--
 
-    <script src = "lib/TrackballControls.js"        ></script>
-      
-<!--
-    <script src = "AudioController.js"              ></script>
-    <script src = "UserAudio.js"                    ></script>
-    <script src = "Stream.js"                       ></script>
--->
+    TODO:
 
-    <script src = "Path.js"                         ></script>
-    <script src = "PathConnector.js"                ></script>
+        lifeLines Shader
+        topPlane Shader should match theme
+
+
+    -->
+
+
+
+    <!-- NOT MINE LIB -->
+    <script src = "lib/three.min.js"                        ></script>
+    <script src = "lib/jquery.min.js"                       ></script>
+    <script src = "lib/underscore.js"                       ></script>
+    <script src = "lib/leap.min.js"                         ></script>
+    <script src = "lib/stats.min.js"                        ></script>
+    <script src = "lib/TrackballControls.js"                ></script>
+    <script src = "lib/simplex-noise.js"                    ></script>
+
+    <script src = "lib/VREffect.js"                         ></script>
+    <script src = "lib/VRControls.js"                       ></script>
+     
+
+    <!-- MINE LIB -->
+    <script src = "lib/ShaderLoader.js"                     ></script>
+    <script src = "lib/TextCreator.js"                      ></script>
+    <script src = "lib/PhysicsRenderer.js"                  ></script>
+    <script src = "lib/PhysicsArrayRenderer.js"             ></script>
+    <script src = "lib/CreateGeometries.js"                 ></script>
+
+
+    <!-- AUDIO -->     
+    <script src = "audio/AudioController.js"                ></script>
+    <script src = "audio/UserAudio.js"                      ></script>
+    <script src = "audio/AudioTexture.js"                   ></script>
+    <script src = "audio/Stream.js"                         ></script>
+
+        
+    <!-- PATHS -->
+    <script src = "path/Path.js"                            ></script>
+    <script src = "path/PathConnector.js"                   ></script>
+    <script src = "path/Wire.js"                            ></script>    
+    <script src = "path/RecursiveConnector.js"              ></script>  
+    <script src = "path/City.js"                            ></script>
+    <script src = "path/TestPath.js"                        ></script>
+    <script src = "path/HARDCORD.js"                        ></script>
+
+
+
+    <!-- PANNING CONTROLS -->
+    <script src = "leap/LeapFingers.js"                     ></script>
+    <script src = "leap/TouchPlane.js"                      ></script>
+    <script src = "leap/TouchPlaneBody.js"                  ></script>
+    <script src = "leap/PanPlane.js"                        ></script>
+    <script src = "leap/Button.js"                          ></script>
+    <script src = "leap/Slider.js"                          ></script>
+    <script src = "leap/ToggleButton.js"                    ></script>
+
+
+    <!-- PUPPY -->
+    <script src = "puppy/RepelerMesh.js"                    ></script>
+    <script src = "puppy/GEM.js"                            ></script>
+    <script src = "puppy/Crucible.js"                       ></script>
+    <script src = "puppy/SpacePuppy.js"                     ></script>
+    
+    <!-- SCENE -->
+    <script src = "scene/Cliff.js"                          ></script>
+    <script src = "scene/Moon.js"                           ></script>
+    <script src = "scene/MoonField.js"                      ></script>
+    <script src = "scene/Mountains.js"                      ></script>
+
+    <!-- PULSE -->
+    <script src = "Pulse.js"                                ></script>
+
+
+
+    <!--npm modules -->
+
 
 
     <script>
 
 
+
+      var loaded = 0;
+      var neededToLoad = 1;
+
+
       var camera, renderer, scene , controls , clock;
 
-      var VR = true
+      var VR = true;
       var effect;
-      
-      
+  
+
       var audioMesh;
+      var stats = new Stats();
+
+      var leap = new Leap.Controller();
+
+      if( VR == true ){
+        leap.setOptimizeHMD(true);
+      }
+
 
       // Setting up shaders
       var shaders = new ShaderLoader( 'shaders' );
 
       shaders.shaderSetLoaded = function(){
-        init();
-        animate();
+        onLoad();
       }
 
+
+
+      // WIRES
       shaders.load( 'vs-pathDebug' , 'pathDebug' , 'vertex'   );
       shaders.load( 'fs-pathDebug' , 'pathDebug' , 'fragment' );
 
       shaders.load( 'vs-path' , 'path' , 'vertex'   );
       shaders.load( 'fs-path' , 'path' , 'fragment' );
+
+      shaders.load( 'vs-building' , 'building' , 'vertex'   );
+      shaders.load( 'fs-building' , 'building' , 'fragment' );
+
+
+      // PANNING
+      shaders.load( 'vs-topPlane' , 'topPlane' , 'vertex' );
+      shaders.load( 'fs-topPlane' , 'topPlane' , 'fragment' );
+
+      shaders.load( 'vs-button' , 'button' , 'vertex' );
+      shaders.load( 'fs-button' , 'button' , 'fragment' );
+
+      shaders.load( 'vs-slider' , 'slider' , 'vertex' );
+      shaders.load( 'fs-slider' , 'slider' , 'fragment' );
+
+      // PUPPY
+      shaders.load( 'ss-puppy' , 'puppy' , 'simulation' );
+
+      shaders.load( 'vs-puppy' , 'puppy' , 'vertex' );
+      shaders.load( 'fs-puppy' , 'puppy' , 'fragment' );
+      
+
+      // Puppy Interface
+      shaders.load( 'fs-lifeDisks' , 'lifeDisks' , 'fragment' );
+      shaders.load( 'vs-lifeDisks' , 'lifeDisks' , 'vertex' );
+      
+      shaders.load( 'fs-lifeBases' , 'lifeBases' , 'fragment' );
+      shaders.load( 'vs-lifeBases' , 'lifeBases' , 'vertex' );
+
+      shaders.load( 'fs-crucible' , 'crucible' , 'fragment' );
+      shaders.load( 'vs-crucible' , 'crucible' , 'vertex' );
+
+
+      // Scene 
+      shaders.load( 'ss-moonBeams' , 'moonBeams' , 'simulation' );
+
+      shaders.load( 'vs-moonBeams' , 'moonBeams' , 'vertex'     );
+      shaders.load( 'fs-moonBeams' , 'moonBeams' , 'fragment'   );
+
+      shaders.load( 'vs-moonBeamLines' , 'moonBeamLines' , 'vertex'     );
+      shaders.load( 'fs-moonBeamLines' , 'moonBeamLines' , 'fragment'   );
+
+      shaders.load( 'vs-monk' , 'monk' , 'vertex'     );
+      shaders.load( 'fs-monk' , 'monk' , 'fragment'   );
 
 
 
@@ -62,11 +190,6 @@
       */
       //var audio = new AudioController();
 
-      //var userAudio = new UserAudio( audio.ctx , audio.gain );
-
-
-      // Muting audio, so we don't have feedback
-      //audio.mute.gain.value = 0;
 
 
 
@@ -74,11 +197,68 @@
       // Normals For the Material
       var uniforms = {
   
-        //;t_audio: { type:"t"  , value : audio.texture },
-        dT:      { type:"f"  , value : 0             },
-        time:    { type:"f"  , value : 0             },
+        t_audio: { type:"t"  , value : null },
+        dT:      { type: "f"  , value : 0             },
+        time:    { type: "f"  , value : 0             },
+        fingers: { type: "v3" , value : []            },
+
+        // MOON
+        lightPos: {type:"v3" , value: new THREE.Vector3() },
+        
+
+        // For the interface
+        slider1: { type: "f"  , value : .5 , constraints: [ 0 , 1 ] },
+        slider2: { type: "f"  , value : .9 , constraints: [ 0 , 1 ] },
+        slider3: { type: "f"  , value : 1 , constraints: [ 0 , 1 ] },
+
+        toggle1 : { type: "f" , value: 0 },
+        toggle2 : { type: "f" , value: 0 },
+        toggle3 : { type: "f" , value: 0 },
+        toggle4 : { type: "f" , value: 0 },
+        toggle5 : { type: "f" , value: 0 },
+        toggle6 : { type: "f" , value: 0 },
 
       }
+
+      var G = {};
+
+      G.uniforms = uniforms;
+      G.sliders = [];
+      G.v1 = new THREE.Vector3();
+      G.v2 = new THREE.Vector3();
+      G.v3 = new THREE.Vector3();
+      G.v4 = new THREE.Vector3();
+
+
+
+
+      // Textures
+      G.t = {}
+
+     // G.t.matcap = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');
+      G.t.matcap = THREE.ImageUtils.loadTexture('img/matcaps/metal.jpg');
+      G.t.normal = THREE.ImageUtils.loadTexture('img/normals/snakeSkin.png');
+      //G.t.normal = THREE.ImageUtils.loadTexture('img/beef.jpg');
+
+      G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
+
+      G.t.sprite = THREE.ImageUtils.loadTexture('img/sprites/flare.png');
+
+
+
+
+
+      G.audio = new AudioController();
+      G.uniforms.t_audio.value = G.audio.texture;
+
+
+      var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
+
+
+      //Muting audio, so we don't have feedback
+      G.audio.mute.gain.value = 0;
+
+
 
 
       function init(){
@@ -94,10 +274,14 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , .001 , 100 );
-        camera.position.z = 2;
+        camera = new THREE.PerspectiveCamera( 65 , w/h , .01 , 100 );
+        camera.position.z = 0.3;
+        camera.position.y = 0.1;
+        camera.lookAt( new THREE.Vector3() );
+
 
         scene = new THREE.Scene();
+       // scene.fog = new THREE.Fog( 0x000000 , 3 , 50 )
 
         var dpr = window.devicePixelRatio || 1;
         renderer = new THREE.WebGLRenderer();
@@ -106,113 +290,97 @@
 
         document.body.appendChild( renderer.domElement );
 
-
-
-
+        stats.domElement.id = 'stats';
+        document.body.appendChild( stats.domElement );
 
 
         window.addEventListener( 'resize', onWindowResize, false );
+        if( VR == true ){
+          window.addEventListener('dblclick', onDoubleClick , false );
+        }
+        textCreator =  new TextCreator( 100 );
+
+        if( VR == true ){
+
+          effect = new THREE.VREffect( renderer );
+          effect.setSize( window.innerWidth, window.innerHeight );
+
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
 
         clock = new THREE.Clock();
 
-        controls = new THREE.TrackballControls( camera );
-
-
-        var xWidth = .07;     
-
-        var inputPaths = []
-
-
-        var points = [];
-        points.push( new THREE.Vector3( -3 , 0 , -9 ));
-        points.push( new THREE.Vector3( -3 , 0 , -8 ));
-        points.push( new THREE.Vector3( -3 , 0 , -7 ));
-        points.push( new THREE.Vector3( -3 , 0 , -6 ));
-
-        points.push( new THREE.Vector3(  0 , 0 , -3 ));
-
-        inputPaths.push({
-
-          points: points,
-          numWires: 3
-
-        });
-
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  3 , 0 , -9 ));
-        points.push( new THREE.Vector3(  3 , 0 , -8 ));
-        points.push( new THREE.Vector3(  3 , 0 , -7 ));
-        points.push( new THREE.Vector3(  3 , 0 , -6 ));
-        
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  5 , 0 , -9 ));
-        points.push( new THREE.Vector3(  5 , 0 , -8 ));
-        points.push( new THREE.Vector3(  5 , 0 , -7 ));
-        points.push( new THREE.Vector3(  5 , 0 , -6 ));
-        
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-        var points = [];
-        points.push( new THREE.Vector3(  10 , 0 , -9 ));
-        points.push( new THREE.Vector3(  10 , 0 , -8 ));
-        points.push( new THREE.Vector3(  10 , 0 , -7 ));
-        points.push( new THREE.Vector3(  10 , 0 , -3 ));
-        
-
-        //points.push( new THREE.Vector3(  0 , 0 , -2 ));
-
-        inputPaths.push({
-          points: points,
-          numWires: 4
-        });
-
-
-
-        // Output PAth
-        var points = [];
-
-        points.push( new THREE.Vector3( 0 , 0 , 0 ));
-        points.push( new THREE.Vector3( 0 , 0 , 4 ));
-        points.push( new THREE.Vector3( 2 , 0 , 6 ));
-        points.push( new THREE.Vector3( 2 , 0 , 7 ));
-        points.push( new THREE.Vector3( 2 , 0 , 8 ));
-        points.push( new THREE.Vector3( 0 , 0 , 9 ));
-        points.push( new THREE.Vector3( 0 , 0 , 11 ));
-
-        var output = {
-          points: points,
-          numWires:0
+        if( VR == true ){
+          controls = new THREE.VRControls( camera );
+        }else{
+          controls = new THREE.TrackballControls( camera );
         }
 
 
-        var paths = new PathConnector( inputPaths , output , xWidth , 1 );
+        G.light = new THREE.PointLight( 0xfffffff , 1 , 100 );
+        scene.add( G.light );
 
-        paths.body.position.y = -.5;
-        scene.add( paths.body );
-
-
-
+        G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .03 , 1 ) , new THREE.MeshBasicMaterial() );
+        scene.add( G.lightMarker );
 
 
+        G.fingers = new LeapFingers( VR );
+
+
+        G.fingers.addToScene( scene );
+        leap.connect();
+
+
+
+        pulse = new Pulse();
+
+        var position = new THREE.Vector3(0, 0 , 0);
+        var normal = new THREE.Vector3( 0 , 1 , 0 );
+        var x = 3;
+        var y = 3;
+        var bufferDistance = .03;
+
+        var body = new THREE.Object3D();
+        body.rotation.x = -Math.PI / 2;
+        body.position.y = -.1;
+
+        G.touchPlane = new TouchPlane( 
+          G.fingers.tips , 
+          body,
+          [x,y],
+          bufferDistance 
+        );
+
+        scene.add( G.touchPlane.body )
+
+        touchPlaneBody = new TouchPlaneBody( G.touchPlane );
+
+
+        if( VR == true ){
+          G.touchPlane.body.position.y = -.4;
+         // G.city.body.position.z = -.0;
+        }else{
+          G.touchPlane.body.position.y = -.1;
+         // G.city.body.position.z = -.0;
+        }
+
+        //G.city.body.rotation.x = Math.PI / 2;
+
+        G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
+
+
+        G.panPlane.forceMultiplier = 30;
+
+        G.panPlane.maxX = 15;
+        G.panPlane.maxY = 33;
+
+
+
+        //pulse.body.position.y = -20
+
+
+     
 
 
 
@@ -221,13 +389,24 @@
       
       function animate(){
 
+
+        stats.update();
         requestAnimationFrame( animate );
        
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;
 
+        var f = leap.frame();
+
+        G.fingers.update( f );
+        G.touchPlane.update();
+        G.panPlane.update();
+
+
         controls.update();
-        //audio.update();
+        G.audio.update();
+        
+        pulse.update();
         
 
         if( VR == true ){
@@ -237,17 +416,42 @@
         }
 
 
+
+
       }
 
 
-      function onWindowResize() {
+      function onWindowResize(){
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+        if( VR == true ){
+          effect.setSize( window.innerWidth , window.innerHeight );
+        }else{
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
 
-			}
+
+      }
+
+      function onDoubleClick() {
+        if( VR == true ){
+          effect.setFullScreen( true );
+          controls.zeroSensor();
+        }
+      }
+
+      function onLoad(){
+
+        loaded ++;
+        
+        if( loaded == neededToLoad ){
+          init();
+          animate();
+        }
+
+      }
 
 
 
