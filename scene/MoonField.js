@@ -9,7 +9,7 @@ function MoonField( puppyPos ){
   this.depth = 16;
   this.joints = 8;
   this.jointSize = this.depth / this.joints;
-  this.size = 8;
+  this.size = 32;
   var ss = shaders.ss.moonBeams;
 
   this.puppyPos = puppyPos;
