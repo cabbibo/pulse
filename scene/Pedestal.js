@@ -1,7 +1,11 @@
 function Pedestal(){
 
   var geo = this.createGeometry();
-  var mat = new THREE.MeshNormalMaterial();
+  var mat = new THREE.ShaderMaterial({
+    uniforms: G.uniforms,
+    vertexShader: shaders.vs.pedestal,
+    fragmentShader: shaders.fs.pedestal,
+  });
 
   this.body = new THREE.Mesh( geo , mat );
 

@@ -127,7 +127,7 @@ TouchPlane.prototype.update = function(){
       }
 
       // Make sure we dont care about super deep poks
-      if( d > -this.bufferDistance * 2 && d > -this.bufferDistance * 2 ){
+      if( d > -this.bufferDistance * 2 && d > -this.bufferDistance * 4 ){
         if( oD > 0 && d <= 0 ){
           console.log( this.touchPoints[i] )
           var XY = this.getXY( this.touchPoints[i] )

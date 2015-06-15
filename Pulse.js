@@ -9,17 +9,30 @@ function Pulse(){
   this.puppy = new SpacePuppy( puppySize , G.fingers.tips , puppyPos  );
 
 
-  var mat =  new THREE.MeshPhongMaterial({
-    color:0x333333,
-    specular: 0xbbbbbb,
-    shininess: 1000
+  this.flowDirection = { type:"f" }
+  var mat =  new THREE.ShaderMaterial({
+    uniforms: G.uniforms,
+    vertexShader: shaders.vs.energyFlow,
+    fragmentShader: shaders.fs.energyFlow,
   });
 
   var geo = new THREE.CylinderGeometry( .01 , .01 , puppyPos - .3 , 20 , 1)
-  this.connection = new THREE.Mesh( geo , mat );
-  this.connection.position.z = -puppyPos / 2  + .1;
-  this.connection.rotation.x = -Math.PI / 2;
-  this.connection.position.y = .012;
+  this.energyFlow = new THREE.Mesh( geo , mat );
+  this.energyFlow.position.z = -puppyPos / 2  + .1;
+  this.energyFlow.rotation.x = -Math.PI / 2;
+  this.energyFlow.position.y = .012;
+
+
+  var geo = new THREE.CylinderGeometry( .015, .015 , puppyPos - .3 ,8 , 200 )
+  this.pipeline = new THREE.Mesh( geo , new THREE.MeshNormalMaterial({
+    wireframe:true,
+    //blending: THREE.AdditiveBlending,
+    transparent: true,
+    frustumCulled: false
+  }));
+  this.pipeline.position.z = -puppyPos / 2  + .1;
+  this.pipeline.rotation.x = -Math.PI / 2;
+  this.pipeline.position.y = .012;
 
 
 
@@ -76,6 +89,7 @@ function Pulse(){
       fragmentShader: shaders.fs.water,
     })
   );
+
   this.water.position.y = -.99;
   this.water.rotation.x = -Math.PI / 2;
   this.body.add( this.water );
@@ -162,7 +176,8 @@ Pulse.prototype.addCity = function( fingers ){
 
   this.body.add( this.city.buildings );
   this.body.add( this.city.wire );
-  this.body.add( this.connection );
+  this.body.add( this.energyFlow );
+  //this.body.add( this.pipeline );
 
   for( var i = 0; i < this.city.batteries.length; i++ ){
     this.body.add( this.city.batteries[i] );
@@ -191,8 +206,9 @@ Pulse.prototype.enlighten = function(){
         G.uniforms.rainbow.value = this.v;
       })
       .onComplete(function(e){
-        console.log('YAAA')
-        //self.body.add( self.sky );
+
+         G.uniforms.flowDirection.value = -1;
+
       })
       .start();
 

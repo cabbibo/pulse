@@ -23,6 +23,11 @@ function PanPlane( plane , touchPlane , forceBased ){
   this.maxX  = 5;
   this.maxY  = 5;
 
+  this.minX  = -5;
+  this.minY  = -5;
+
+
+
   this.forceMultiplier = 1.;
   this.forcePower = 2.;
 
@@ -107,16 +112,16 @@ PanPlane.prototype.update = function( valid ){
     this.position.x = this.maxX;
   }
 
-  if( this.position.x < -this.maxX ){
-    this.position.x = -this.maxX;
+  if( this.position.x < this.minX ){
+    this.position.x = this.minX;
   }
 
   if( this.position.y > this.maxY ){
     this.position.y = this.maxY;
   }
 
-  if( this.position.y < -this.maxY ){
-    this.position.y = -this.maxY;
+  if( this.position.y < this.minY ){
+    this.position.y = this.minY;
   }
 
 

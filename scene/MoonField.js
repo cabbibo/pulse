@@ -600,7 +600,6 @@ MoonField.prototype.createMonkGeo = function( sides , height , baseRadius , face
   var bp = new THREE.Vector3();
 
 
-  console.log( 'TOTAL VERTS  : '+ totalVerts)
 
   for( var i = 0; i < this.size; i++){
 

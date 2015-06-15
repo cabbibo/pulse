@@ -1,4 +1,5 @@
 uniform float rainbow;
+uniform float cityButton;
 uniform sampler2D t_audio;
 
 varying vec3 vDist;
@@ -26,10 +27,11 @@ void main(){
   }
 
   float vRainbow = getRainbow();
-  if( vRainbow < rainbow ){
+  if( vRainbow < rainbow  || cityButton > .5 ){
     vec3 a = texture2D( t_audio , vec2( abs( sin( vUv.y * .1 ) ), 0.  )).xyz;
     col = (vNorm * .5 + .5 ) * ( 1. + window) * a;
   }
+
 
 
   gl_FragColor = vec4( col , 1.);

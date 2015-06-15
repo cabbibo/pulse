@@ -137,12 +137,6 @@ function BuildingMesh( basePaths , buildingSize , uniforms ){
   geo.addAttribute( 'normal' , normal );
   geo.addAttribute( 'id' , id);
 
-
-
-
-  console.log('BUDDD')
-  console.log( uniforms );
-  console.log( G.fingers.tips.length )
   var vs = shaders.setValue( shaders.vs.building , 'SIZE' , G.fingers.tips.length );
   var fs = shaders.fs.building;
   var mat = new THREE.ShaderMaterial({

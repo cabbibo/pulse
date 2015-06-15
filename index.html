@@ -136,11 +136,16 @@
 
       var loaded = 0;
       var neededToLoad = 1;
+      
 
 
       var camera, renderer, scene , controls , clock;
 
       var VR = false;
+
+      var startPoint = -25;
+      var mute = 0;
+
       var effect;
   
 
@@ -232,6 +237,15 @@
       shaders.load( 'vs-sky' , 'sky' , 'vertex'     );
       shaders.load( 'fs-sky' , 'sky' , 'fragment'   );
 
+      shaders.load( 'vs-energyFlow' , 'energyFlow' , 'vertex'     );
+      shaders.load( 'fs-energyFlow' , 'energyFlow' , 'fragment'   );
+
+      shaders.load( 'vs-battery' , 'battery' , 'vertex'     );
+      shaders.load( 'fs-battery' , 'battery' , 'fragment'   );
+
+      shaders.load( 'vs-pedestal' , 'pedestal' , 'vertex'     );
+      shaders.load( 'fs-pedestal' , 'pedestal' , 'fragment'   );
+
 
 
       /*
@@ -263,6 +277,7 @@
         slider1: { type: "f"  , value : .5 , constraints: [ 0 , 1 ] },
         slider2: { type: "f"  , value : .9 , constraints: [ 0 , 1 ] },
         slider3: { type: "f"  , value : 1 , constraints: [ 0 , 1 ] },
+        slider4: { type: "f"  , value : .3 , constraints: [ 0 , 1 ] },
 
         toggle1 : { type: "f" , value: 0 },
         toggle2 : { type: "f" , value: 0 },
@@ -273,8 +288,11 @@
 
 
         cityButton : { type: "f" , value: 0 },
+        //cityButton : { type: "f" , value: 0 },
 
         rainbow : { type: "f" , value: 0 },
+
+        flowDirection: { type:"f" , value: 1}
 
       }
 
@@ -295,12 +313,13 @@
       // Textures
       G.t = {}
 
-     // G.t.matcap = THREE.ImageUtils.loadTexture('img/matcap/blood.jpg');
+      G.t.matcap2 = THREE.ImageUtils.loadTexture('assets/img/matcaps/blood.jpg');
       G.t.matcap = THREE.ImageUtils.loadTexture('assets/img/matcaps/metal.jpg');
       G.t.normal = THREE.ImageUtils.loadTexture('assets/img/normals/snakeSkin.png');
-      //G.t.normal = THREE.ImageUtils.loadTexture('assets/img/beef.jpg');
+      G.t.normal2 = THREE.ImageUtils.loadTexture('assets/img/normals/beef.jpg');
 
       G.t.normal.wrapT = G.t.normal.wrapS = THREE.RepeatWrapping;
+      G.t.normal2.wrapT = G.t.normal2.wrapS = THREE.RepeatWrapping;
 
       G.t.sprite = THREE.ImageUtils.loadTexture('assets/img/sprites/flare.png');
 
@@ -360,7 +379,6 @@
         addLoad();
 
         audioBuffer.addLoadEvent( function(){
-          console.log( 'yup')
           onLoad();
         });
 
@@ -375,7 +393,6 @@
         addLoad();
 
         audioBuffer.addLoadEvent( function(){
-          console.log( 'yup')
           onLoad();
         });
 
@@ -386,7 +403,7 @@
 
 
       //Muting audio, so we don't have feedback
-      //G.audio.mute.gain.value = 0;
+      G.audio.mute.gain.value = mute;
 
 
 
@@ -406,11 +423,11 @@
 
         camera = new THREE.PerspectiveCamera( 60 , w/h , .01 , 100 );
 
-        camera.position.z = 1.5;
+        camera.position.z = .5;
         if( VR  == false ){
-          camera.position.y = 0.5;
+          camera.position.y = 0.05;
         }else{
-          camera.position.y = .1;  
+          camera.position.y = .01;  
         }
 
         camera.lookAt( new THREE.Vector3() );
@@ -481,8 +498,6 @@
           G.uniforms.vels.value.push( new THREE.Vector3() );
         }
 
-        console.log( G.uniforms.tips.value)
-
         leap.connect();
 
 
@@ -524,14 +539,17 @@
         G.panPlane = new PanPlane( pulse.body , G.touchPlane , true );
 
 
+        
+        pulse.body.position.y = startPoint
         G.panPlane.forceMultiplier = 200;
 
         G.panPlane.maxX = 15;
-        G.panPlane.maxY = 33;
+        G.panPlane.maxY = 40 + startPoint;
+
+        G.panPlane.minX = -15;
+        G.panPlane.minY = -11 +startPoint;
 
 
-
-        //pulse.body.position.y = 7.5
        // pulse.body.position.y = -29.5
 
 
@@ -612,6 +630,7 @@
 
                 G.v1.copy( G.uniforms.vels.value[1] );
                 var l = G.v1.length();
+                l = Math.min( 1. , l );
                 G.v1.normalize();
                 G.v1.multiplyScalar( l );
                 G.v1.multiplyScalar( -.4 )
@@ -641,16 +660,16 @@
             G.panPlane.body.position.x = -G.panPlane.maxX;
           }
 
-          if( -G.panPlane.body.position.x < -G.panPlane.maxX ){
-            G.panPlane.body.position.x = G.panPlane.maxX;
+          if( -G.panPlane.body.position.x < G.panPlane.minX ){
+            G.panPlane.body.position.x = -G.panPlane.minX;
           }
 
           if( G.panPlane.body.position.z > G.panPlane.maxY ){
             G.panPlane.body.position.z = G.panPlane.maxY;
           }
 
-          if( G.panPlane.body.position.z < -G.panPlane.maxY ){
-            G.panPlane.body.position.z = -G.panPlane.maxY;
+          if( G.panPlane.body.position.z < G.panPlane.minY ){
+            G.panPlane.body.position.z = G.panPlane.minY;
           }
           G.planeVel.multiplyScalar( .9 )
 
@@ -663,7 +682,9 @@
         TWEEN.update();
 
 
-       // controls.update();
+        if( VR == true ){
+          controls.update();
+        }
         G.audio.update();
         
         pulse.update();

@@ -193,7 +193,7 @@
 
   Looper.prototype._onNewMeasure = function(){
 
-    console.log( 'sss');
+
     this.oMeasure = this.measure;
     this.measure +=1;
     this.measureStartTime = this.measure * this.measureLength;

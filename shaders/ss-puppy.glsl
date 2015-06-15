@@ -15,15 +15,23 @@ uniform mat4 mainBodyMatrix;
 
 uniform vec4 repelers[ size ];
 
-uniform float repulsionPower;
-uniform float repulsionRadius;
-uniform float dampening;
-uniform float returnPower;
+uniform float slider1;
+uniform float slider2;
+uniform float slider3;
+uniform float slider4;
+//uniform float repulsionPower;
+//uniform float repulsionRadius;
+//uniform float dampening;
+//uniform float returnPower;
 
 varying vec2 vUv;
 
 void main(){
 
+ float repulsionPower = .02 + slider1 * .02;
+ float repulsionRadius = .1 + slider2 * .7;
+  float returnPower = .5 + slider3 * 9.;
+  float dampening = .8 + slider4 * .17; //slider3 * .1  + .8;
 
  
   vec2 uv = gl_FragCoord.xy / resolution;

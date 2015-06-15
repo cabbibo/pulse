@@ -36,9 +36,15 @@ City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUnifor
 
 
 
-  var battMat =  new THREE.MeshPhongMaterial({
-    color:0x333333,
-    specular: 0x999999
+  var vs = shaders.setValue( shaders.vs.battery , 'SIZE' , G.fingers.tips.length );
+  var fs = shaders.fs.battery;
+
+  console.log(vs)
+
+  var battMat =  new THREE.ShaderMaterial({
+    uniforms: G.uniforms,
+    vertexShader : vs,
+    fragmentShader : fs,
   });
 
 
@@ -101,8 +107,6 @@ City.prototype.createLung = function( totalSize ,  buildingUniforms , wireUnifor
 
   batteries.push( battery )
 
-  console.log( 'BuildingMesh')
-  console.log( buildingUniforms )
   var buildings = new BuildingMesh( basePaths , 2.5 * totalSize , buildingUniforms );
 
   var wireInfo = new Wire( finishedWires , wireUniforms );

@@ -32,6 +32,30 @@ function Interface( fingers , puppy){
 
       interfaceString = "Heighten Normal Map"
 
+    }else if( i == 3 ){
+
+      interfaceString = "Audio Lookup Size"
+
+    }else if( i == 4 ){
+
+      interfaceString = "Change Normal Map"
+      button.toggle  = function(){ 
+        this.interface.puppy.uniforms.t_normal.value = G.t.normal2;
+      }.bind( button );
+      button.unToggle = function(){ 
+        this.interface.puppy.uniforms.t_normal.value = G.t.normal;
+      }.bind( button );
+
+    }else if( i == 5 ){
+
+      interfaceString = "Toggle Matcap"
+      button.toggle  = function(){ 
+        this.interface.puppy.uniforms.t_matcap.value = G.t.matcap2;
+      }.bind( button );
+      button.unToggle = function(){ 
+        this.interface.puppy.uniforms.t_matcap.value = G.t.matcap;
+      }.bind( button );
+
     }
 
     button.hoverDown = function(){ this.interface.showText( this ); }.bind( button );
@@ -49,8 +73,7 @@ function Interface( fingers , puppy){
     text.position.y = .1;
     text.position.x = .06 * 2;
     //text.position.x -= text.totalWidth;
-    console.log( 's' )
-    console.log( text );
+
 
     this.textMeshes.push( text );
 
@@ -60,7 +83,7 @@ function Interface( fingers , puppy){
 
   }
 
-  for( var  i = 0; i < 3; i++ ){
+  for( var  i = 0; i < 4; i++ ){
 
     var body = new THREE.Object3D();
     body.position.x =  .06 * 3 + i * .03;
@@ -69,23 +92,28 @@ function Interface( fingers , puppy){
     var slider = new Slider( .1 , fingers , body , .01 );
 
     var interfaceString = "UNTITLED"
+
     if( i == 0 ){ 
 
-      interfaceString = "Toggle Lifelines"
+      interfaceString = "Repulsion Power"
      // button.toggle = function(){ this.interface.puppy.turnOnLifelines(); }.bind( button );
      // button.unToggle = function(){ this.interface.puppy.turnOffLifelines(); }.bind( button );
       
     }else if( i == 1 ){
 
-      interfaceString = "Toggle Normal Map"
+      interfaceString = "Repulsion Radius"
 
     }else if( i == 2 ){
 
-      interfaceString = "Heighten Normal Map"
+      interfaceString = "Return Power"
+
+    }else if( i == 3 ){
+
+      interfaceString = "Dampening"
 
     }
 
-    slider.hoverDown = function(){ console.log('ADADDAAD' ); this.interface.showText( this ); }.bind( slider );
+    slider.hoverDown = function(){ this.interface.showText( this ); }.bind( slider );
     slider.hoverUp   = function(){ this.interface.clearText(); }.bind( slider );
 
 
@@ -102,9 +130,7 @@ function Interface( fingers , puppy){
     text.position.y = .1;
     text.position.x = .06 * 2;
 
-    //text.position.x -= text.totalWidth;
-    console.log( 's' )
-    console.log( text );
+
 
     this.textMeshes.push( text );
  
@@ -119,7 +145,7 @@ function Interface( fingers , puppy){
 
 Interface.prototype.showText = function( button ){
 
-  console.log( this );
+ 
   for( var i = 0; i < this.buttons.length; i++ ){
     if( this.buttons[ i ] != button ){
       this.body.remove( this.textMeshes[i] );

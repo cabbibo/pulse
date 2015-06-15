@@ -13,7 +13,6 @@ function Slider( size , touchers , body , bufferDistance ){
 
   var scale = new THREE.Vector2( x , y );
   scale.multiplyScalar( 1 / y );
-  console.log( scale );
 
   this.uniforms =  {
 

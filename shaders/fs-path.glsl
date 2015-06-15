@@ -4,6 +4,8 @@ uniform float slider1;
 uniform float slider2;
 uniform float slider3;
 uniform sampler2D t_audio;
+
+uniform float cityButton;
 varying float vID;
 
 
@@ -15,7 +17,7 @@ void main(){
 
   vec4 col = texture2D( t_audio , vec2( abs(cos(vID*.7 * slider1)) , 0. ));
   float vRainbow = getRainbow();
-  if( vRainbow < rainbow ){
+  if( vRainbow < rainbow || cityButton > .5  ){
     col.xyz *= hsv( abs(cos(vID*.5 * slider1)) , slider2 , slider3 );
   }
 

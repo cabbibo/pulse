@@ -30,8 +30,6 @@ function SpacePuppy( size ,  fingers , zPos ){
 
   this.body.add( this.cube );
 
-  console.log('FDINGS')
-  console.log( fingers )
   this.interface = new Interface([
     this.fingers[1],
     this.fingers[6],
@@ -95,12 +93,18 @@ function SpacePuppy( size ,  fingers , zPos ){
     toggle5      : G.uniforms.toggle5,
     toggle6      : G.uniforms.toggle6,
 
+    slider1      : G.uniforms.slider1,
+    slider2      : G.uniforms.slider2,
+    slider3      : G.uniforms.slider3,
+    slider4      : G.uniforms.slider4,
+
+
     repelers	   : { type:"v4v"  , value: this.repelers    },
 
-    returnPower     : { type:"f" , value: 4. },
+   /* returnPower     : { type:"f" , value: 4. },
     repulsionPower  : { type:"f" , value: .02, constraints:[-300  , 0] },
-    repulsionRadius : { type:"f" , value: .4 , constraints:[ 0  , 1000] },
-    dampening       : { type:"f" , value: .9 , constraints:[ .8 , .999] },
+    //repulsionRadius : { type:"f" , value: .4 , constraints:[ 0  , 1000] },
+    dampening       : { type:"f" , value: .9 , constraints:[ .8 , .999] },*/
 
       
 
@@ -625,7 +629,7 @@ SpacePuppy.prototype.createLifeDisks = function( repelers ){
   var vs = shaders.vs.lifeDisks;
   var fs = shaders.setValue( shaders.fs.lifeDisks , 'NUMDISKS' , repelers.length )
 
-  console.log( fs )
+
   var mat = new THREE.ShaderMaterial({
     uniforms:{
       t_audio: G.uniforms.t_audio,
@@ -945,7 +949,7 @@ SpacePuppy.prototype.createLifeBases = function( bases ){
   var vs = shaders.vs.lifeBases;
   var fs = shaders.setValue( shaders.fs.lifeBases , 'NUMDISKS' , bases.length )
 
-  console.log( fs )
+
   var mat = new THREE.ShaderMaterial({
     uniforms:{
       t_audio: G.uniforms.t_audio,

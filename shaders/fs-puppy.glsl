@@ -67,7 +67,7 @@ void main(){
   float iFR = 1. - fr;
 
   vec3 a = texture2D( t_audio , vec2( abs(sin(dot( reflect( vLightDir , fNorm  )  , vCamVec ))) , 0. ) ).xyz *iFR;
-  vec4 aC = texture2D( t_audio , vec2( abs(sin(dot( -vLightDir , fNorm ))) , 0. )  );
+  vec4 aC = texture2D( t_audio , vec2( abs(sin(dot( -vLightDir , fNorm ) * ( 1. + toggle4 * 20.))) , 0. )  );
 
   vec3 rC = color2 * pow( refl , custom1 * 30. );
   vec3 lC = color1 * pow( lamb , custom2 * 5. );
