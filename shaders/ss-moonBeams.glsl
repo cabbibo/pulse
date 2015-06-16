@@ -40,31 +40,19 @@ void main(){
 
   f += vec3( .0 , .0002 * ( 1. / pow( clamp( pos.y, .1 , 1. ) , 2. ) ) , 0. );
   f += normalize(toPos - pos.xyz) * .01;
-  f += curlNoise( pos.xyz * .4 ) * .009 * ( 1. - life );
+  f += curlNoise( pos.xyz * .4 ) * .009 * ( 1. - clamp( length( toDif ) , 0. , 40. ) / 40. );
 
 
-  if( life > 1. ){
-    life = 1.;
+  if( life > 2. && life < 10. ){
+    life = .9;
     vel = vec3( 0. );
     f = vec3( 0. , .004 , 0. );
-
   }
 
-  if( toDif < .05 ){ 
-    life = -10000.; 
-  }
-
-
-  if( life > 0. ){
-    life = clamp( length( toDif ) , 0. , 40. ) / 40.;
-  }
-
-  life -= .0003 + (1. + length( a ) * .1 ) * rand( uv ) * .001;
-
-  if( life < 0. ){
-    life = 10000.;
+  if( life > 10. ){
+    life = 9.5;
     vel = vec3( 0. );
-    f = vec3( 0. );
+    f = vec3( 0. , .0 , 0. );
 
     p = texture2D( t_monk , vec2( uv.x , 0. )).xyz;
 
@@ -72,9 +60,21 @@ void main(){
     p.x += cos( t ) * ringRadius;
     p.z += sin( t ) * ringRadius;
 
+  }
+
+
+  if( toDif < .05 && life < 2. ){ 
+  
+    vel = vec3( 0. );
+    f = vec3( 0. );
+    life = 1000.;
+
+
     //p.z += rand( uv );
     //p.x += rand( uv * vec2( 33.512 ,  752.123 ));
   }
+
+
 
 
 

@@ -10,7 +10,8 @@ void main(){
 
   float vRainbow = getRainbow();
   if( vRainbow < rainbow ){
-    col.xyz *= vMNorm * .5 + .5;
+    vec3 newCol = vMNorm * .5 + .5;
+    col.xyz = mix( col.xyz , newCol,  clamp( ( rainbow - vRainbow ) * 30., 0. , 1. ));
   }
 
   gl_FragColor = col;

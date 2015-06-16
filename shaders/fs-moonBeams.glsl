@@ -21,9 +21,9 @@ void main(){
 
   vec4 col = clamp( vDist * 3. , 0. , 1. )* a * s * multiplier;
   float vRainbow = getRainbow();
-  if( vRainbow < rainbow ){
+  //if( vRainbow < rainbow ){
     col.xyz *= normalize( vVel ) * .5 + .5;
-  }
+  //}
 
   gl_FragColor = col;
 }

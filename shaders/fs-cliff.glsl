@@ -27,7 +27,8 @@ void main(){
 
   float vRainbow = getRainbow();
   if( vRainbow < rainbow ){
-    col = (fNorm * .5 + .5) * texture2D( t_audio , vec2( lamb , 0. )).xyz;
+    vec3 newCol = (fNorm * .5 + .5) * texture2D( t_audio , vec2( lamb , 0. )).xyz;
+    col = mix( col , newCol,  clamp( ( rainbow - vRainbow ) * 1., 0. , 1. ));
   }
   gl_FragColor = vec4( col , 1. );
 

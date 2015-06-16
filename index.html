@@ -52,7 +52,7 @@
     <script src = "lib/underscore.js"                       ></script>
     <script src = "lib/leap.min.js"                         ></script>
     <script src = "lib/stats.min.js"                         ></script>
-    <script src = "lib/TrackballControls.js"                ></script>
+    <!--<script src = "lib/TrackballControls.js"                ></script>-->
     <script src = "lib/simplex-noise.js"                    ></script>
     <script src = "lib/Tween.js"                            ></script>
 
@@ -144,7 +144,7 @@
       var VR = false;
 
       var startPoint = 7.5;
-      var mute = 1;
+      var mute = 0;
 
       var effect;
   
@@ -455,6 +455,9 @@
           window.addEventListener('dblclick', onDoubleClick , false );
         }
 
+        window.addEventListener( 'mousewheel'    , onMouseWheel, false );
+        window.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
         clock = new THREE.Clock();
         G.objectControls = new ObjectControls( camera );
         
@@ -474,7 +477,7 @@
         if( VR == true ){
           controls = new THREE.VRControls( camera );
         }else{
-          controls = new THREE.TrackballControls( camera );
+          //controls = new THREE.TrackballControls( camera );
         }
 
 
@@ -723,6 +726,16 @@
         }
       }
 
+      function onMouseWheel(e ) {
+        console.log( e );
+
+        camera.position.y -= e.deltaY / 20000;
+
+        if( camera.position.y < 0 ){ camera.position.y = 0; }
+        if( camera.position.y > 3 ){ camera.position.y = 3; }
+        G.v1.set( 0 , 0 , 0 );
+        camera.lookAt( G.v1)
+      }
       function onLoad(){
 
         loaded ++;
