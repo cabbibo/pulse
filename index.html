@@ -142,10 +142,10 @@
 
       var camera, renderer, scene , controls , clock;
 
-      var VR = false;
+      var VR = true;
 
-      var startPoint = 7.5;
-      var mute = 0;
+      var startPoint = -7.5;
+      var mute = 1;
 
       var effect;
   
@@ -344,7 +344,15 @@
 
       G.looper = new Looper({
 
-        beatsPerMinute: 122,
+        beatsPerMinute: 120,
+        beatsPerMeasure: 4,
+        measuresPerLoop: 8
+        
+      });
+
+      G.sadLooper = new Looper({
+
+        beatsPerMinute: 76,
         beatsPerMeasure: 4,
         measuresPerLoop: 8
         
@@ -353,29 +361,29 @@
 
       //var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
 
-
       var toLoadAudioArray = [
-        "assets/audio/df/1.mp3",
-        "assets/audio/df/5.mp3",
-        "assets/audio/df/4.mp3",
-      //  "assets/audio/df/2.mp3",
-      //  "assets/audio/df/3.mp3",
+        "monk1",
+        "monk2",
+        "monk3",
+        "monk4",
+        "monk5",
+        "monk6",
+        "monk7",
+        "monk8",
+        "monk9",
+        "sadChords",
+        "sadLead"
+
       ];
 
-      var toLoadLoopArray = [
-        "assets/audio/credits/anime.mp3",
-        "assets/audio/credits/bass.mp3",
-        "assets/audio/credits/clap.mp3",
-        "assets/audio/credits/kick.mp3",
-        "assets/audio/credits/vox.mp3"
-      ];
 
-      G.audioBuffers = [];
-      G.loopBuffers  = [];
+      G.audioBuffers = {};
 
       for( var i = 0; i < toLoadAudioArray.length; i++ ){
 
-        var audioBuffer = new AudioBuffer( G.audio.ctx , toLoadAudioArray[i] );
+        var name = toLoadAudioArray[i]
+        var file = "assets/audio/" + name + ".mp3"
+        var audioBuffer = new AudioBuffer( G.audio.ctx , file );
 
         addLoad();
 
@@ -383,24 +391,9 @@
           onLoad();
         });
 
-        G.audioBuffers.push( audioBuffer )
+        G.audioBuffers[ name ] = audioBuffer;
 
       }
-
-      for( var i = 0; i < toLoadLoopArray.length; i++ ){
-
-        var audioBuffer = new AudioBuffer( G.audio.ctx , toLoadLoopArray[i] );
-
-        addLoad();
-
-        audioBuffer.addLoadEvent( function(){
-          onLoad();
-        });
-
-        G.loopBuffers.push( audioBuffer )
-
-      }
-
 
 
       //Muting audio, so we don't have feedback
@@ -422,13 +415,13 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 60 , w/h , .01 , 100 );
+        camera = new THREE.PerspectiveCamera( 100 , w/h , .01 , 100 );
 
         camera.position.z = .5;
         if( VR  == false ){
           camera.position.y = 0.05;
         }else{
-          camera.position.y = .01;  
+          camera.position.y = 0;  
         }
 
         camera.lookAt( new THREE.Vector3() );
@@ -486,7 +479,7 @@
         scene.add( G.light );
 
         G.lightMarker = new THREE.Mesh( new THREE.IcosahedronGeometry( .03 , 1 ) , new THREE.MeshBasicMaterial() );
-        scene.add( G.lightMarker );
+        //scene.add( G.lightMarker );
 
 
         G.fingers = new LeapFingers( VR );
@@ -496,6 +489,10 @@
 
         for( var i = 0; i< G.fingers.tips.length; i++ ){
           G.uniforms.tips.value.push( G.fingers.tips[i] );
+        }
+
+         for( var i = 0; i< G.fingers.positions.length; i++ ){
+          G.uniforms.fingers.value.push( G.fingers.positions[i] );
         }
 
         for( var i = 0; i< G.fingers.tips.length; i++ ){
@@ -547,11 +544,23 @@
         pulse.body.position.y = startPoint
         G.panPlane.forceMultiplier = 200;
 
-        G.panPlane.maxX = 15;
-        G.panPlane.maxY = 40 + startPoint;
+        if( VR == false ){
 
-        G.panPlane.minX = -15;
-        G.panPlane.minY = -11 +startPoint;
+          G.panPlane.maxX = 15;
+          G.panPlane.maxY = 40 + startPoint;
+
+          G.panPlane.minX = -15;
+          G.panPlane.minY = -11 +startPoint;
+        }else{
+
+          G.panPlane.maxX = 15;
+          G.panPlane.maxY = 40 
+
+          G.panPlane.minX = -15;
+          G.panPlane.minY = -11 
+
+
+        }
 
 
        // pulse.body.position.y = -29.5
@@ -575,10 +584,12 @@
           new THREE.MeshNormalMaterial()
         ); 
 
-        scene.add( G.intersectionMarker );
-     
+        if( VR == false ){
+          scene.add( G.intersectionMarker );
+        }
 
         G.looper.start();
+        G.sadLooper.start();
 
 
       }
@@ -590,6 +601,7 @@
         stats.update();
         requestAnimationFrame( animate );
 
+        G.sadLooper._update();
         G.looper._update();
        
         uniforms.dT.value = clock.getDelta();

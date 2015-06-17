@@ -1,15 +1,30 @@
 function MoonField( puppyPos ){
   
 
-  this.music = new MonkMusic( G.loopBuffers );
+  var loops = [
+
+  ];
+  var notes = [
+    G.audioBuffers.monk1,
+    G.audioBuffers.monk2,
+    G.audioBuffers.monk3,
+    G.audioBuffers.monk4,
+    G.audioBuffers.monk5,
+    G.audioBuffers.monk6,
+    G.audioBuffers.monk7,
+    G.audioBuffers.monk8,
+    G.audioBuffers.monk9,
+  ]
+
+  this.music = new MonkMusic( loops , notes );
   this.body = new THREE.Object3D();
 
   this.lookPos = new THREE.Vector3();
 
-  this.depth = 16;
-  this.joints = 8;
+  this.depth = 8;
+  this.joints = 4;
   this.jointSize = this.depth / this.joints;
-  this.size = 32;
+  this.size = 16;
   var ss = shaders.ss.moonBeams;
 
   this.puppyPos = puppyPos;
@@ -328,8 +343,10 @@ MoonField.prototype.toggleMonk = function(id){
     this.monks.data[ index + 3 ] = val;
 
 
-    var randID = Math.floor( Math.random() * this.music.filters.length);
-    this.music.filters[randID].frequency.value += 200
+    var randID = Math.floor( Math.random() * this.music.notes.length);
+    //this.music.filters[randID].frequency.value += 200
+
+    this.music.notes[ randID ].play();
 
     /*if( val == 1 ){
       this.resetSingleMonk( id );
@@ -860,6 +877,20 @@ MoonField.prototype.createMonkBody = function(){
 }
 
 
+MoonField.prototype.createMonkNotes = function( buffers ){
 
+  var sources = [];
+
+  for( var i = 0; i < buffers.length; i++ ){
+
+    var source = new BufferedAudio( buffers[i].buffer , G.audio.ctx , G.audio.gain , false );
+    sources.push( source )
+
+  }
+
+  return sources;
+
+
+}
 
 

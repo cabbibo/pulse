@@ -14,6 +14,7 @@ uniform mat4 cubeMatrix;
 uniform mat4 mainBodyMatrix;
 
 uniform vec4 repelers[ size ];
+uniform vec3 fingers[ size ];
 
 uniform float slider1;
 uniform float slider2;
@@ -70,6 +71,26 @@ void main(){
     if( rL < p * p * p * repulsionRadius ){
 
       f += repulsionPower  * p * rN / (rL);
+      repeled += 1.;
+
+    }
+
+
+  }
+
+  for( int i = 0; i < size; i++ ){
+
+    vec3  rP = fingers[ i ].xyz;
+   //rP = ( mainBodyMatrix * vec4( rP.xyz , 1. ) ).xyz;
+    vec3  rD = pos.xyz - rP;
+    float rL = max( .01 , length( rD ) );
+    vec3  rN = normalize( rD );
+
+    float p = 1.;
+    //float p = 1.;
+    if( rL < p * p * p * repulsionRadius ){
+
+      f -= repulsionPower* .1  * p * rN / rL;
       repeled += 1.;
 
     }

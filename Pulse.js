@@ -110,18 +110,12 @@ function Pulse(){
 
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
-
   positions.push( new THREE.Vector3( 0 , 0 , puppyPos/4 ) );
-
-  positions.push( new THREE.Vector3( 10 , 0 , -puppyPos/2 ) );
-  positions.push( new THREE.Vector3( -10 , 0 , -puppyPos/2 ) );
-
 
 
   
-
-  this.audioField = new AudioField( this.body , G.audioBuffers, positions , true );
+  var loops = [ G.audioBuffers.sadChords , G.audioBuffers.sadLead ];
+  this.audioField = new AudioField( this.body , loops , positions , true );
   this.audioField.add();
 
 

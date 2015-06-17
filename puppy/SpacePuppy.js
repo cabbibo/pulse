@@ -83,7 +83,7 @@ function SpacePuppy( size ,  fingers , zPos ){
     t_matcap     : { type:"t"    , value: G.t.matcap       },
     t_normal     : { type:"t"    , value: G.t.normal       },
     t_audio	     : { type:"t"    , value: G.audio.texture  },
-    fingers      : { type:"v3"   , value: fingers          },
+    fingers      : G.uniforms.fingers,
 
 
     toggle1      : G.uniforms.toggle1,

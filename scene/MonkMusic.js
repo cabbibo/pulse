@@ -1,8 +1,9 @@
-function MonkMusic( buffers ){
+function MonkMusic( buffers , notes ){
 	
   this.buffers = buffers;
   this.filters = [];
   this.sources = [];
+  this.notes   = [];
 
 	for( var i = 0; i < this.buffers.length; i++ ){
 
@@ -16,6 +17,13 @@ function MonkMusic( buffers ){
 
     var source = new BufferedAudio( buffers[i].buffer , G.audio.ctx , filter , false );
     this.sources.push( source )
+
+  }
+
+  for( var i = 0; i < notes.length; i++ ){
+
+    var source = new BufferedAudio( notes[i].buffer , G.audio.ctx , G.audio.gain , false );
+    this.notes.push( source )
 
   }
 
