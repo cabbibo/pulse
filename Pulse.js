@@ -101,7 +101,12 @@ function Pulse(){
   this.pedestal = new Pedestal();
   this.body.add( this.pedestal.body );
   G.v1.set( 0 , 0 , puppyPos/4 )
-  this.pedestal.body.position.copy( G.v1 )
+  this.pedestal.body.position.copy( G.v1 );
+
+
+
+  var social = new Social();
+  this.body.add( social );
 
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
