@@ -114,9 +114,20 @@ function Pulse(){
 
 
   
-  var loops = [ G.audioBuffers.sadChords , G.audioBuffers.sadLead ];
-  this.audioField = new AudioField( this.body , loops , positions , true );
+  var loops = [ G.audioBuffers.sadChords , G.audioBuffers.sadLead  ];
+  this.sadAudioField = new AudioField( this.body , loops , positions , G.sadLooper );
+  this.sadAudioField.add();
+
+
+  var positions = [];
+  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+
+  var loops = [ G.audioBuffers.spacePuppy ];
+  this.audioField = new AudioField( this.body , loops , positions , G.looper );
   this.audioField.add();
+
+  this.audioField.filters[0].frequency.value = 40;
+
 
 
 
@@ -130,6 +141,7 @@ Pulse.prototype.update = function(){
 
   this.moon.update();
   this.moonField.update();
+  this.sadAudioField.update();
   this.audioField.update();
   this.pedestal.update();
 
@@ -158,13 +170,15 @@ Pulse.prototype.addCity = function( fingers ){
 
 
   button.toggle = function(){ 
+    this.sadAudioField.filters[0].frequency.value = 4;
+    this.sadAudioField.filters[1].frequency.value = 4;
     this.audioField.filters[0].frequency.value = 4000;
     this.moonField.start(); 
   }.bind( this );
-  button.unToggle = function(){ 
+  /*button.unToggle = function(){ 
     this.moonField.stop(); 
-    this.audioField.filters[0].frequency.value = 40;
-  }.bind( this );
+    this.sadAudioField.filters[0].frequency.value = 40;
+  }.bind( this );*/
 
   var string = 'cityButton'
   var u = G.uniforms[ string ];

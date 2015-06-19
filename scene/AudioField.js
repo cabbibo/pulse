@@ -1,4 +1,4 @@
-function AudioField( body , buffers , positions , looping ){
+function AudioField( body , buffers , positions , looper ){
 
   this.body = body;
   this.buffers = buffers;
@@ -27,11 +27,7 @@ function AudioField( body , buffers , positions , looping ){
     var filter = G.audio.ctx.createBiquadFilter();
     filter.type = 'hipass';
 
-    if( i == 0 ){
-      filter.frequency.value = 40;
-    }else{
-      filter.frequency.value = 4000;
-    }
+    filter.frequency.value = 4000;
 
     g.connect( filter );
     filter.connect( G.audio.gain );
@@ -45,7 +41,7 @@ function AudioField( body , buffers , positions , looping ){
 
   this.add();
 
-  G.sadLooper.everyLoop( function(){
+  looper.everyLoop( function(){
 
     for( var i = 0; i < this.sources.length; i++ ){
       this.sources[i].play();
