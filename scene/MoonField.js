@@ -2,19 +2,30 @@ function MoonField( puppyPos ){
   
 
   var loops = [
-
+    G.audioBuffers.monkLoop 
   ];
   var notes = [
-    G.audioBuffers.monk1,
+   // G.audioBuffers.monk1,
     G.audioBuffers.monk2,
     G.audioBuffers.monk3,
     G.audioBuffers.monk4,
     G.audioBuffers.monk5,
     G.audioBuffers.monk6,
-    G.audioBuffers.monk7,
+   // G.audioBuffers.monk7,
     G.audioBuffers.monk8,
     G.audioBuffers.monk9,
+    G.audioBuffers.monk10,
+    G.audioBuffers.monk11,
+    G.audioBuffers.monk12,
+    G.audioBuffers.monk13,
+    G.audioBuffers.monk14,
+    G.audioBuffers.monk15,
+    G.audioBuffers.monk16,
+    G.audioBuffers.monk17,
+    G.audioBuffers.monk18,
   ]
+
+
 
   this.music = new MonkMusic( loops , notes );
   this.body = new THREE.Object3D();
@@ -333,6 +344,7 @@ MoonField.prototype.toggleAllMonks = function(){
 
 MoonField.prototype.toggleMonk = function(id){
 
+  this.music.notes[ id ].play();
   if( this.toggled[id] == false ){
     this.toggled[id] = true;
 
@@ -344,9 +356,11 @@ MoonField.prototype.toggleMonk = function(id){
 
 
     var randID = Math.floor( Math.random() * this.music.notes.length);
-    //this.music.filters[randID].frequency.value += 200
+    
 
-    this.music.notes[ randID ].play();
+    this.music.filters[0].frequency.value += 100
+
+    //this.music.notes[ randID ].play();
 
     /*if( val == 1 ){
       this.resetSingleMonk( id );

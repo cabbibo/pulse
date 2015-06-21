@@ -121,12 +121,14 @@ function Pulse(){
 
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
 
-  var loops = [ G.audioBuffers.spacePuppy ];
+  var loops = [ G.audioBuffers.spacePuppy , G.audioBuffers.baseLoop ];
   this.audioField = new AudioField( this.body , loops , positions , G.looper );
   this.audioField.add();
 
   this.audioField.filters[0].frequency.value = 40;
+  this.audioField.filters[1].frequency.value = 40;
 
 
 
@@ -173,6 +175,7 @@ Pulse.prototype.addCity = function( fingers ){
     this.sadAudioField.filters[0].frequency.value = 4;
     this.sadAudioField.filters[1].frequency.value = 4;
     this.audioField.filters[0].frequency.value = 4000;
+    this.audioField.filters[1].frequency.value = 4000;
     this.moonField.start(); 
   }.bind( this );
   /*button.unToggle = function(){ 

@@ -5,6 +5,7 @@ function MonkMusic( buffers , notes ){
   this.sources = [];
   this.notes   = [];
 
+
 	for( var i = 0; i < this.buffers.length; i++ ){
 
     var filter = G.audio.ctx.createBiquadFilter();
@@ -26,6 +27,7 @@ function MonkMusic( buffers , notes ){
     this.notes.push( source )
 
   }
+
 
   G.looper.everyLoop( function(){
 
