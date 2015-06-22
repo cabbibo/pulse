@@ -7,6 +7,11 @@ function Social(){
       crispness: 3
     });
 
+
+  text.material.side = THREE.FrontSide;
+  text.materialNeedsUpdate = true;
+
+
 	text.material.opacity = .6
 	text.hoverOver = function(){
    		this.material.opacity = 1
@@ -36,6 +41,9 @@ function Social(){
       size: 1.1,
       crispness: 3
     });
+
+ text.material.side = THREE.FrontSide;
+  text.materialNeedsUpdate = true;
 
 
     text.position.y = -.35;

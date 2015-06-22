@@ -72,7 +72,7 @@ AudioField.prototype.update = function(){
     
     var l = G.v1.length();
 
-    var v = Math.min( 1. , 1 / l );
+    var v = Math.min( 1. , 20 / l );
     this.gainNodes[i].gain.value = v;
 
   }

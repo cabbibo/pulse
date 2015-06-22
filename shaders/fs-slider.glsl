@@ -13,7 +13,7 @@ void main(){
 
 	float vRainbow = getRainbow();
 	if( vRainbow < rainbow ){
-		baseCol = hsv( abs(sin(vUv.y * 1.)) , 1. , 1. );
+		baseCol = hsv( abs(sin(vUv.y * .1)) , 1. , 1. );
 	}
 
 	vec4 col = vec4( baseCol , .2 );

@@ -358,13 +358,21 @@
         
       });
 
-      G.sadLooper = new Looper({
+     /* G.sadLooper = new Looper({
 
         beatsPerMinute: 76,
         beatsPerMeasure: 4,
         measuresPerLoop: 8
         
       });
+
+      G.baseLooper = new Looper({
+
+        beatsPerMinute: 70,
+        beatsPerMeasure: 4,
+        measuresPerLoop: 8
+        
+      });*/
 
 
       //var userAudio = new UserAudio( G.audio.ctx , G.audio.gain );
@@ -389,11 +397,25 @@
         "monk17",
         "monk18",
 
+/*
         "sadChords",
         "sadLead",
         "spacePuppy",
         "baseLoop",
-        "monkLoop",
+        "monkLoop", */
+
+        "bass",
+        "bells",
+        "choir",
+        "chords",
+        "drums",
+        "lead",
+        "noise",
+        "ride",
+        "monkSounds",
+
+        "startClick"
+
 
       ];
 
@@ -610,7 +632,8 @@
         }
 
         G.looper.start();
-        G.sadLooper.start();
+        //G.sadLooper.start();
+        //G.baseLooper.start();
 
 
       }
@@ -622,8 +645,9 @@
         stats.update();
         requestAnimationFrame( animate );
 
-        G.sadLooper._update();
+
         G.looper._update();
+
        
         uniforms.dT.value = clock.getDelta();
         uniforms.time.value += uniforms.dT.value;

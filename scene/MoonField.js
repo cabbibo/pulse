@@ -2,7 +2,7 @@ function MoonField( puppyPos ){
   
 
   var loops = [
-    G.audioBuffers.monkLoop 
+    G.audioBuffers.ride,
   ];
   var notes = [
    // G.audioBuffers.monk1,
@@ -358,7 +358,9 @@ MoonField.prototype.toggleMonk = function(id){
     var randID = Math.floor( Math.random() * this.music.notes.length);
     
 
-    this.music.filters[0].frequency.value += 100
+    for( var i = 0; i < this.music.filters.length; i++ ){
+      this.music.filters[i].frequency.value += 1000
+    }
 
     //this.music.notes[ randID ].play();
 

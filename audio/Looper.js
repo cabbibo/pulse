@@ -114,6 +114,29 @@
 
   }
 
+  Looper.prototype.tweenToEnd = function( callback , startValue , endValue ){
+
+    var percentTilEnd = 1 - this.percentOfLoop;
+    var timeTilEnd = percentTilEnd * this.loopLength;
+
+    var  i = { value: startValue }
+    var  t = { value: endValue }
+
+    var  tween = new TWEEN.Tween( i ).to( t , timeTilEnd * 1000 );
+
+    tween.easing( TWEEN.Easing.Quartic.In )
+
+    tween.onUpdate(function(){
+      
+      callback( i.value );
+
+    }.bind(tween));
+
+    tween.start();
+
+
+  }
+
   Looper.prototype.onNextMeasure = function( callback ){
 
     this.onNextMeasureArray.push( callback )

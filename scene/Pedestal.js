@@ -30,6 +30,9 @@ Pedestal.prototype.prepare = function(){
 
   button.toggle = function(){ 
     pulse.enlighten();
+    this.body.remove( this.button.body );
+    G.objectControls.remove( this.button.topPlane );
+    this.button = undefined;
   }.bind( this );
 
   button.unToggle = function(){ 

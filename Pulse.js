@@ -108,28 +108,57 @@ function Pulse(){
   var social = new Social();
   this.body.add( social );
 
+
+/*
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
   positions.push( new THREE.Vector3( 0 , 0 , puppyPos/4 ) );
 
-
-  
   var loops = [ G.audioBuffers.sadChords , G.audioBuffers.sadLead  ];
   this.sadAudioField = new AudioField( this.body , loops , positions , G.sadLooper );
-  this.sadAudioField.add();
+  this.sadAudioField.add();*/
 
 
   var positions = [];
-  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
 
-  var loops = [ G.audioBuffers.spacePuppy , G.audioBuffers.baseLoop ];
+  var ab = G.audioBuffers
+  var loops = [ 
+    ab.chords , 
+    ab.noise,
+    ab.drums ,  
+    ab.choir ,
+    ab.bells ,
+    ab.bass , 
+    ab.lead , 
+    ab.monkSounds,
+
+
+  ];
   this.audioField = new AudioField( this.body , loops , positions , G.looper );
   this.audioField.add();
 
-  this.audioField.filters[0].frequency.value = 40;
-  this.audioField.filters[1].frequency.value = 40;
+  for( var i = 0; i < this.audioField.filters.length; i++ ){
+    this.audioField.filters[i].frequency.value = 10;
+  }
 
+
+  this.audioField.filters[0].frequency.value = 100;
+  this.audioField.filters[1].frequency.value = 500;
+
+  var b = G.audioBuffers.startClick.buffer;
+
+  this.startClick = new BufferedAudio( b , G.audio.ctx , G.audio.gain , false );
 
 
 
@@ -143,11 +172,12 @@ Pulse.prototype.update = function(){
 
   this.moon.update();
   this.moonField.update();
-  this.sadAudioField.update();
   this.audioField.update();
   this.pedestal.update();
 
-  this.cityButton.update();
+  if( this.cityButton ){
+    this.cityButton.update();
+  }
 
   G.uniforms.lightPos.value.copy( this.moon.globalPos );
   G.light.position.copy( this.moon.globalPos );
@@ -172,16 +202,38 @@ Pulse.prototype.addCity = function( fingers ){
 
 
   button.toggle = function(){ 
-    this.sadAudioField.filters[0].frequency.value = 4;
-    this.sadAudioField.filters[1].frequency.value = 4;
-    this.audioField.filters[0].frequency.value = 4000;
-    this.audioField.filters[1].frequency.value = 4000;
+   // this.audioField.filters[0].frequency.value = 10000;
+    //this.audioField.filters[1].frequency.value = 4000;
     this.moonField.start(); 
+    this.startClick.play();
+
+    G.objectControls.remove( this.cityButton.topPlane );
+    this.body.remove( this.cityButton.body );
+    this.cityButton = undefined;
+
+
+    var callback = function( value ){
+
+      this.audioField.filters[0].frequency.value = value * 10000 + 200;
+      this.audioField.filters[1].frequency.value = value * 10000 + 1000;
+
+    }.bind( this );
+
+
+    G.looper.tweenToEnd( callback , 0 , 1 )
+
   }.bind( this );
-  /*button.unToggle = function(){ 
-    this.moonField.stop(); 
-    this.sadAudioField.filters[0].frequency.value = 40;
-  }.bind( this );*/
+  button.unToggle = function(){ 
+    var callback = function( value ){
+
+      this.audioField.filters[0].frequency.value = value * 10000 + 200;
+      this.audioField.filters[1].frequency.value = value * 10000 + 1000;
+
+    }.bind( this );
+
+
+    G.looper.tweenToEnd( callback , 1 , 0 )
+  }.bind( this );
 
   var string = 'cityButton'
   var u = G.uniforms[ string ];
@@ -210,7 +262,7 @@ Pulse.prototype.addPuppy = function(){
 Pulse.prototype.enlighten = function(){
  
 
-  var s ={ 
+  /*var s ={ 
     v: 0
   }
   var e ={ v: 1 }
@@ -225,13 +277,35 @@ Pulse.prototype.enlighten = function(){
 
          G.uniforms.flowDirection.value = -1;
 
-      })
+        for(var i = 0; i < this.audioField.filters.length; i++){
+          this.audioField.filters[i].frequency.value = 10000;
+        }
+
+      }.bind( this ))
       .start();
+*/
+
+  var callback = function( value ){
+
+    G.uniforms.rainbow.value = value;
+    G.uniforms.flowDirection.value = -value;
+
+    for(var i = 2; i < this.audioField.filters.length; i++){
+      this.audioField.filters[i].frequency.value = value * 10000 + 40;
+    }
+
+
+  }.bind( this );
+
+
+  G.looper.tweenToEnd( callback , 0 , 1 )
+
+
 
 
 }
 
-Pulse.prototype.unenlighten = function(){
+/*Pulse.prototype.unenlighten = function(){
  
   var s ={ 
     v: 1
@@ -251,4 +325,4 @@ Pulse.prototype.unenlighten = function(){
       .start();
 
 
-}
+}*/
