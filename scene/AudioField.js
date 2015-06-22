@@ -55,7 +55,7 @@ function AudioField( body , buffers , positions, radii , looper ){
 AudioField.prototype.add = function(){
 
   for( var i = 0; i < this.buffers.length; i++ ){
-    this.body.add( this.markers[i] );
+    //this.body.add( this.markers[i] );
     //this.sources[i].play();
   }
 

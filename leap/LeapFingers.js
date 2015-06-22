@@ -7,7 +7,7 @@ function LeapFingers( VR ){
   this.positions = [];
   this.tips = [];
 
-  var geo = new THREE.IcosahedronGeometry( .005 , 1 )
+  var geo = new THREE.IcosahedronGeometry( .005 , 0 )
   var mat = new THREE.MeshNormalMaterial();
 
   for( var i = 0; i < 50; i++ ){
