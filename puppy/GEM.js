@@ -3,7 +3,7 @@ function GEM( params ){
   this.params = _.defaults( params || {} , {
 
     
-    geometry: new THREE.IcosahedronGeometry( 10 , 5 ),
+    //geometry: new THREE.IcosahedronGeometry( 10 , 5 ),
 
     ss: shaders.simulationShaders.ball,
     vs: shaders.vertexShaders.ball,

@@ -64,6 +64,7 @@ Pedestal.prototype.createGeometry = function(){
   var vertsPerCrystal = ( baseVerts + headVerts );
   var totalVerts = vertsPerCrystal  * numCrystals;
 
+
   // Get base position in shader by looking up into 
   var positions = new Float32Array( totalVerts * 3 );
   var uvs       = new Float32Array( totalVerts * 2 );

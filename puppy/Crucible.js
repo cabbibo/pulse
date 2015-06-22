@@ -112,7 +112,9 @@ function Crucible( songParams){
   this.mountains.rotation.x = - Math.PI / 2;
 
   console.log( this.mountains );
-  this.body.add( this.mountains );
+//  this.body.add( this.mountains );
+
+console.log( 'EHLSS')
 
 
   var gooMat = new THREE.ShaderMaterial({

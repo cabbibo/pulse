@@ -19,7 +19,7 @@ function TouchPlaneBody( touchPlane ){
   var vs = shaders.setValue( shaders.vs.topPlane , 'SIZE' , touchers.length );
   var fs = shaders.setValue( shaders.fs.topPlane , 'SIZE' , touchers.length );
 
-	var geo = new THREE.PlaneBufferGeometry( tp.x , tp.y , tp.x * 200 , tp.y * 200 );
+	var geo = new THREE.PlaneBufferGeometry( tp.x , tp.y , tp.x * 40 , tp.y * 40 );
 	var mat = new THREE.ShaderMaterial({
     uniforms: this.uniforms,
 		vertexShader: vs,

@@ -22,6 +22,7 @@ function Mountains(){
 
 
 
+
   var positions = new Float32Array( totalVerts * 3 );
   var uvs       = new Float32Array( totalVerts * 2 );
   var normals   = new Float32Array( totalVerts * 3 );
