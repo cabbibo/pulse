@@ -68,12 +68,13 @@ function MoonField( puppyPos ){
     this.body.add( this.monks.markers[i] );
   }
 
+  this.soulDirection = new THREE.Vector3(0 , .5 , -puppyPos);
   this.soul = new PhysicsArrayRenderer( this.size , this.depth , ss , renderer );
 
   this.soul.setUniform( 'dT'   , G.dT    );
   this.soul.setUniform( 'time' , G.time  );
   this.soul.setUniform( 't_audio' , G.uniforms.t_audio );
-  this.soul.setUniform( 'puppyPos' , { type:"f", value:puppyPos })
+  this.soul.setUniform( 'toPos' , { type:"v3", value:this.soulDirection })
   this.soul.setUniform( 't_monk' , this.t_monk )
   this.soul.setUniform( 'ringRadius' , this.ringRadius )
   
@@ -399,6 +400,7 @@ MoonField.prototype.lockMonk = function(id){
 
 MoonField.prototype.allToggled = function(){
   pulse.pedestal.prepare();
+  this.soulDirection.set( 0 , 0 , 7.5 );
 }
 
 MoonField.prototype.allLocked = function(){

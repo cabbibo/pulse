@@ -3,7 +3,7 @@ uniform sampler2D t_pos;
 uniform sampler2D t_oPos;
 uniform sampler2D t_audio;
 uniform sampler2D t_monk;
-uniform float puppyPos;
+uniform vec3 toPos;
 uniform float ringRadius;
 
 uniform vec2 resolution;
@@ -25,7 +25,6 @@ void main(){
   vec3 vel    = pos.xyz - oPos.xyz;
   vec3 p      = pos.xyz;
 
-  vec3 toPos = vec3( 0. , .5 , -puppyPos  );
   float life  = pos.w;
 
 
@@ -63,7 +62,7 @@ void main(){
   }
 
 
-  if( toDif < .05 && life < 2. ){ 
+  if( toDif < .5 && life < 2. ){ 
   
     vel = vec3( 0. );
     f = vec3( 0. );

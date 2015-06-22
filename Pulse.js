@@ -7,7 +7,7 @@ function Pulse(){
   this.city = new City( citySize , undefined , G.uniforms , G.uniforms );
 
   this.puppy = new SpacePuppy( puppySize , G.fingers.tips , puppyPos  );
-
+  this.puppyPos = puppyPos;
 
   this.flowDirection = { type:"f" }
   var mat =  new THREE.ShaderMaterial({
@@ -121,16 +121,24 @@ function Pulse(){
 
   var positions = [];
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 7.5 ) );
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 7.5 ) );
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
-  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
+  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+  positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+
+  var radii = [
+    20,
+    5,
+    15,
+    10,
+    5,
+    10,
+    10,
+    5
+  ]
 
   var ab = G.audioBuffers
   var loops = [ 
@@ -145,7 +153,7 @@ function Pulse(){
 
 
   ];
-  this.audioField = new AudioField( this.body , loops , positions , G.looper );
+  this.audioField = new AudioField( this.body , loops , positions , radii , G.looper );
   this.audioField.add();
 
   for( var i = 0; i < this.audioField.filters.length; i++ ){
@@ -184,6 +192,13 @@ Pulse.prototype.update = function(){
   G.lightMarker.position.copy( this.moon.globalPos );
 
   this.puppy.update();
+
+  if( this.enlightened ){
+    this.moonField.soulDirection.copy( camera.position )
+    this.moonField.soulDirection.sub( G.panPlane.body.position )
+    G.v1.set( 0 , 0 , -7.5 )
+    this.moonField.soulDirection.sub( G.v1 )
+  }
 
 }
 
@@ -285,6 +300,8 @@ Pulse.prototype.enlighten = function(){
       .start();
 */
 
+  this.enlightened = true;
+
   var callback = function( value ){
 
     G.uniforms.rainbow.value = value;
@@ -294,6 +311,7 @@ Pulse.prototype.enlighten = function(){
       this.audioField.filters[i].frequency.value = value * 10000 + 40;
     }
 
+    //this.moonField.soulDirection.set( 0 , .5 , 7.5 - value * ( this.puppyPos + 7.5 ) );
 
   }.bind( this );
 

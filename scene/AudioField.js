@@ -1,4 +1,4 @@
-function AudioField( body , buffers , positions , looper ){
+function AudioField( body , buffers , positions, radii , looper ){
 
   this.body = body;
   this.buffers = buffers;
@@ -15,6 +15,7 @@ function AudioField( body , buffers , positions , looper ){
 
     var m = new THREE.Mesh( geo , mat );
     m.position.copy( positions[i] );
+    m.radius = radii[i]
     this.markers.push( m );
     
 
@@ -65,6 +66,8 @@ AudioField.prototype.update = function(){
   for( var i  = 0; i< this.buffers.length; i++ ){
     
     var m = this.markers[i]
+
+    var r = m.radius
    
     G.v1.copy( m.position );
     G.v1.applyMatrix4( this.body.matrixWorld );
@@ -72,7 +75,7 @@ AudioField.prototype.update = function(){
     
     var l = G.v1.length();
 
-    var v = Math.min( 1. , 20 / l );
+    var v = Math.min( 1. , r / l );
     this.gainNodes[i].gain.value = v;
 
   }
