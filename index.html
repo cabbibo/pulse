@@ -2,7 +2,7 @@
 
   <head>
     <style>
-      body{ margin: 0px; font-family:  "GeoSans" }
+      body{ margin: 0px; font-family:  "GeoSans"; background:#000 ; color:#fff;}
       html{ overflow: hidden }
       #stats{ 
         position: absolute;
@@ -11,14 +11,25 @@
         z-index: 999;
       }
 
+      #renderer{
+        position: absolute;
+        top:0px;
+        left: 0px;
+        overflow: hidden;
+      }
+
       @font-face {
         font-family: "GeoSans";
-        src: url("../assets/GeosansLight.ttf");
+        src: url("assets/GeosansLight.ttf");
       }
     </style>
   </head>
 
   <body>
+    <h1> Loading music, this might take a moment!</h1>
+    <h1> Audio by JJ Verne </h1>
+    <h1> Code by Cabbibo </h1>
+
 
     <!--
 
@@ -154,6 +165,10 @@
       var camera, renderer, scene , controls , clock;
 
       var VR = false;
+
+      var url = document.URL;
+      var stringArray = url.split("#");
+      if( stringArray[1] ){ if( stringArray[1] == 'VR' ) VR = true; }
 
       var startPoint = 7.5;
       var mute = 1;
@@ -487,6 +502,7 @@
         renderer.setPixelRatio( dpr );
         renderer.setSize( window.innerWidth, window.innerHeight );
 
+        renderer.domElement.id = 'renderer'
         document.body.appendChild( renderer.domElement );
 
         stats.domElement.id = 'stats';
