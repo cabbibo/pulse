@@ -401,13 +401,13 @@ MoonField.prototype.lockMonk = function(id){
 MoonField.prototype.allToggled = function(){
   pulse.pedestal.prepare();
   this.soulDirection.set( 0 , 0 , 7.5 );
-  pulse.audioField.filters[0].frequency.value = 100;
+  pulse.audioField.filters[0].frequency.value = 400;
   pulse.audioField.filters[1].frequency.value = 100000;
 
   for( var i = 0; i < this.music.filters.length; i++ ){
-    this.music.filters[i].frequency.value = 100
+    this.music.filters[i].frequency.value = 400
   }
-  
+
 }
 
 MoonField.prototype.allLocked = function(){
