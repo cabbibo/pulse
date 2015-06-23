@@ -128,6 +128,7 @@ function Pulse(){
   positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
   positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
   positions.push( new THREE.Vector3( 0 , 0 , -puppyPos ) );
+  positions.push( new THREE.Vector3( 0 , 0 , 0 ) );
 
   var radii = [
     20,
@@ -137,7 +138,9 @@ function Pulse(){
     5,
     10,
     10,
-    5
+    5,
+    15
+
   ]
 
   var ab = G.audioBuffers
@@ -145,12 +148,13 @@ function Pulse(){
   var loops = [ 
     ab.chords , 
     ab.noise,
-    ab.drums ,  
+    ab.kick ,
     ab.choir ,
     ab.bells ,
     ab.bass , 
     ab.lead , 
     ab.monkSounds,
+    ab.snare
   ];
 
   this.audioField = new AudioField( this.body , loops , positions , radii , G.looper );
