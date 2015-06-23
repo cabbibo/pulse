@@ -10,7 +10,7 @@ void main(){
 
   //float vRainbow = getRainbow();
   if( vMatch < rainbow ){
-    col.xyz = ( vMNorm * .5 + .5 ) * min( 1. , ( rainbow - vMatch ) * 10. );
+    col.xyz = ( -vMNorm * .5 + .5 ) * min( 1. , ( rainbow - vMatch ) * 10. );
   }
 
   gl_FragColor = col;

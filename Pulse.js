@@ -141,6 +141,7 @@ function Pulse(){
   ]
 
   var ab = G.audioBuffers
+
   var loops = [ 
     ab.chords , 
     ab.noise,
@@ -150,9 +151,8 @@ function Pulse(){
     ab.bass , 
     ab.lead , 
     ab.monkSounds,
-
-
   ];
+
   this.audioField = new AudioField( this.body , loops , positions , radii , G.looper );
   this.audioField.add();
 
@@ -307,9 +307,14 @@ Pulse.prototype.enlighten = function(){
     G.uniforms.rainbow.value = value;
     G.uniforms.flowDirection.value = -value;
 
-    for(var i = 2; i < this.audioField.filters.length; i++){
+    for(var i = 0; i < this.audioField.filters.length; i++){
       this.audioField.filters[i].frequency.value = value * 10000 + 40;
     }
+
+    for( var i = 0; i < this.moonField.music.filters.length; i++ ){
+      this.moonField.music.filters[i].frequency.value = value * 10000 + 100;
+    }
+  
 
     //this.moonField.soulDirection.set( 0 , .5 , 7.5 - value * ( this.puppyPos + 7.5 ) );
 

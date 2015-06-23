@@ -446,7 +446,7 @@
       G.audio.mute.gain.value = mute;
 
 
-      var rendererStats  = new rStats();
+      //var rendererStats  = new rStats();
 
 
 
@@ -488,11 +488,11 @@
         document.body.appendChild( renderer.domElement );
 
         stats.domElement.id = 'stats';
-        document.body.appendChild( stats.domElement );
+        //document.body.appendChild( stats.domElement );
 
 
 
-        tS = new threeStats( renderer ); // init after WebGLRenderer is created
+       /* tS = new threeStats( renderer ); // init after WebGLRenderer is created
 
         rS = new rStats( {
             values: {
@@ -512,7 +512,7 @@
             plugins: [
                 tS,
             ]
-        } );
+        } );*/
 
 
         window.addEventListener( 'resize', onWindowResize, false );
@@ -783,7 +783,7 @@
 
 
 
-        rS( 'frame' ).start();
+        //rS( 'frame' ).start();
 
         if( VR == true ){
           effect.render( scene, camera );
@@ -791,9 +791,9 @@
           renderer.render( scene , camera );
         }
 
-        rS( 'frame' ).end();
+        /*rS( 'frame' ).end();
 
-        rS().update();
+        rS().update();*/
 
 
 
